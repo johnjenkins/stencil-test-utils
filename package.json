@@ -1,0 +1,79 @@
+{
+  "name": "@stencil/test-utils",
+  "version": "0.1.0",
+  "description": "First-class testing utilities for Stencil design systems with Vitest",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./config": {
+      "types": "./dist/config.d.ts",
+      "import": "./dist/config.js"
+    },
+    "./mock-doc-setup": {
+      "types": "./dist/testing/mock-doc-setup.d.ts",
+      "import": "./dist/testing/mock-doc-setup.js"
+    },
+    "./browser": {
+      "types": "./dist/testing/browser-render.d.ts",
+      "import": "./dist/testing/browser-render.js"
+    }
+  },
+  "files": [
+    "dist/",
+    "README.md"
+  ],
+  "keywords": [
+    "stencil",
+    "testing",
+    "vitest",
+    "web components",
+    "component testing"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "peerDependencies": {
+    "@stencil/core": "^4.0.0",
+    "vitest": "^2.0.0 || ^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@playwright/test": {
+      "optional": true
+    },
+    "@wdio/globals": {
+      "optional": true
+    },
+    "jsdom": {
+      "optional": true
+    },
+    "happy-dom": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@stencil/core": "^4.0.0",
+    "@types/node": "^20.0.0",
+    "@vitest/coverage-v8": "^3.0.0",
+    "typescript": "~5.8.3",
+    "vitest": "^3.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "test:unit": "vitest run tests",
+    "test:integration": "pnpm test:integration:build && pnpm test:integration:run",
+    "test:integration:build": "cd test-fixtures/basic-stencil && pnpm install && pnpm build",
+    "test:integration:run": "vitest run tests/integration.spec.ts",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "jiti": "^2.6.1"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "basic-stencil-fixture",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Test fixture for @stencil/test-utils",
+  "scripts": {
+    "build": "stencil build",
+    "start": "stencil build --watch",
+    "test": "vitest",
+    "test:browser": "vitest --config vitest.browser.config.ts"
+  },
+  "dependencies": {
+    "@stencil/core": "^4.0.0"
+  },
+  "devDependencies": {
+    "@stencil/test-utils": "workspace:*",
+    "@vitest/browser": "^3.2.4",
+    "playwright": "^1.57.0",
+    "vitest": "^3.0.0"
+  }
+}
