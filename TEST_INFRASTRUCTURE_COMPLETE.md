@@ -8,7 +8,7 @@ I've created a comprehensive test infrastructure for your `@stencil/test-utils` 
 
 ### 1. Test Fixture: Basic Stencil Project
 
-**Location:** `test-fixtures/basic-stencil/`
+**Location:** `test-project/basic-stencil/`
 
 A fully functional Stencil project with:
 
@@ -88,7 +88,7 @@ Validates the package works with real Stencil projects:
 Created comprehensive guides:
 - **`TESTING_GUIDE.md`** - How to test, debug, add fixtures
 - **`TEST_SETUP_SUMMARY.md`** - Quick reference for the test setup
-- **`test-fixtures/README.md`** - Fixture documentation
+- **`test-project/README.md`** - Fixture documentation
 - **`tests/README.md`** - Test directory guide
 
 ### 4. Configuration & Scripts
@@ -99,7 +99,7 @@ Updated `package.json` with test scripts:
   "test": "vitest",
   "test:unit": "vitest run tests",
   "test:integration": "pnpm test:integration:build && pnpm test:integration:run",
-  "test:integration:build": "cd test-fixtures/basic-stencil && pnpm install && pnpm build",
+  "test:integration:build": "cd test-project/basic-stencil && pnpm install && pnpm build",
   "test:integration:run": "vitest run tests/integration.spec.ts",
   "test:coverage": "vitest run --coverage"
 }
@@ -144,7 +144,7 @@ Updated `package.json` with test scripts:
 ## 📁 File Structure Created
 
 ```
-test-fixtures/
+test-project/
 ├── README.md
 └── basic-stencil/
     ├── .gitignore
@@ -193,7 +193,7 @@ pnpm build
 pnpm test:integration:build
 ```
 This will:
-- Navigate to `test-fixtures/basic-stencil`
+- Navigate to `test-project/basic-stencil`
 - Install dependencies
 - Build Stencil components (creates `dist/` with all output targets)
 
@@ -214,7 +214,7 @@ pnpm test:coverage
 
 ### 5. Try the Fixture Directly
 ```bash
-cd test-fixtures/basic-stencil
+cd test-project/basic-stencil
 
 # Run fixture tests
 pnpm test

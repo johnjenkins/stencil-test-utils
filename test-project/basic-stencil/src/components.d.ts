@@ -31,6 +31,10 @@ export namespace Components {
      */
     interface MyCard {
         /**
+          * Card title
+         */
+        "cardTitle"?: string;
+        /**
           * Card elevation (box-shadow depth)
           * @default 1
          */
@@ -40,10 +44,6 @@ export namespace Components {
           * @default false
          */
         "interactive": boolean;
-        /**
-          * Card title
-         */
-        "title"?: string;
     }
 }
 export interface MyButtonCustomEvent<T> extends CustomEvent<T> {
@@ -115,6 +115,10 @@ declare namespace LocalJSX {
      */
     interface MyCard {
         /**
+          * Card title
+         */
+        "cardTitle"?: string;
+        /**
           * Card elevation (box-shadow depth)
           * @default 1
          */
@@ -124,10 +128,6 @@ declare namespace LocalJSX {
           * @default false
          */
         "interactive"?: boolean;
-        /**
-          * Card title
-         */
-        "title"?: string;
     }
     interface IntrinsicElements {
         "my-button": MyButton;

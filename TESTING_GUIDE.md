@@ -14,7 +14,7 @@ The testing strategy consists of:
 
 ### Basic Stencil Fixture
 
-Location: `test-fixtures/basic-stencil/`
+Location: `test-project/basic-stencil/`
 
 A minimal Stencil project with two components:
 
@@ -73,7 +73,7 @@ The integration tests follow this workflow:
 
 ```bash
 # 1. Build the fixture
-cd test-fixtures/basic-stencil
+cd test-project/basic-stencil
 pnpm install
 pnpm build
 
@@ -120,11 +120,11 @@ import { existsSync } from 'node:fs';
 describe('Integration', () => {
   it('should work with Stencil project', () => {
     // Verify fixture setup
-    expect(existsSync('./test-fixtures/basic-stencil')).toBe(true);
+    expect(existsSync('./test-project/basic-stencil')).toBe(true);
     
     // Run fixture tests
     execSync('pnpm test --run', { 
-      cwd: './test-fixtures/basic-stencil' 
+      cwd: './test-project/basic-stencil' 
     });
   });
 });
@@ -136,8 +136,8 @@ To add a new fixture for testing specific scenarios:
 
 1. **Create fixture directory:**
    ```bash
-   mkdir -p test-fixtures/my-fixture
-   cd test-fixtures/my-fixture
+   mkdir -p test-project/my-fixture
+   cd test-project/my-fixture
    ```
 
 2. **Initialize Stencil project:**
@@ -187,7 +187,7 @@ pnpm test -t "should render component"
 
 ```bash
 # Build fixture manually
-cd test-fixtures/basic-stencil
+cd test-project/basic-stencil
 pnpm build
 
 # Check outputs

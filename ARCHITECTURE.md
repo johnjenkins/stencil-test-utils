@@ -180,7 +180,7 @@ User writes test:
 ┌──────────────────────────────────────────────────────────┐
 │                 2. Fixture Build                          │
 │                                                           │
-│  cd test-fixtures/basic-stencil                          │
+│  cd test-project/basic-stencil                          │
 │  pnpm install  (installs @stencil/test-utils)            │
 │  pnpm build    (runs stencil build)                      │
 │  ├─ dist/esm/loader.js          ← Lazy loader           │

@@ -4,16 +4,16 @@ This document summarizes the test infrastructure created for `@stencil/test-util
 
 ## What Was Created
 
-### 1. Test Fixtures (`test-fixtures/`)
+### 1. Test Fixtures (`test-project/`)
 
 #### Basic Stencil Fixture
 A complete, minimal Stencil project for testing:
 
-**Location:** `test-fixtures/basic-stencil/`
+**Location:** `test-project/basic-stencil/`
 
 **Structure:**
 ```
-test-fixtures/basic-stencil/
+test-project/basic-stencil/
 ├── package.json              # Fixture dependencies
 ├── stencil.config.ts        # Stencil configuration
 ├── vitest.config.ts         # Uses defineVitestConfig
@@ -76,7 +76,7 @@ Added to `package.json`:
   "test": "vitest",
   "test:unit": "vitest run tests",
   "test:integration": "pnpm test:integration:build && pnpm test:integration:run",
-  "test:integration:build": "cd test-fixtures/basic-stencil && pnpm install && pnpm build",
+  "test:integration:build": "cd test-project/basic-stencil && pnpm install && pnpm build",
   "test:integration:run": "vitest run tests/integration.spec.ts",
   "test:coverage": "vitest run --coverage"
 }
@@ -91,7 +91,7 @@ Added to `package.json`:
   - Debugging tips
   - CI/CD guidance
 
-- **`test-fixtures/README.md`**: Fixture documentation
+- **`test-project/README.md`**: Fixture documentation
   - Structure explanation
   - Usage instructions
   - Requirements for new fixtures
@@ -169,7 +169,7 @@ pnpm test:integration
 ```
 
 This will:
-1. Navigate to `test-fixtures/basic-stencil`
+1. Navigate to `test-project/basic-stencil`
 2. Install dependencies
 3. Build the Stencil components
 4. Run the integration tests
@@ -189,7 +189,7 @@ open coverage/index.html
 
 ### 1. Build Fixture
 ```bash
-cd test-fixtures/basic-stencil
+cd test-project/basic-stencil
 pnpm install
 pnpm build
 ```
@@ -256,9 +256,9 @@ describe('my-button', () => {
 | `vitest.config.ts` | Main test configuration |
 | `tests/render.spec.ts` | Unit tests for render API |
 | `tests/integration.spec.ts` | Integration tests |
-| `test-fixtures/basic-stencil/` | Test fixture project |
-| `test-fixtures/basic-stencil/vitest.config.ts` | Uses defineVitestConfig |
-| `test-fixtures/basic-stencil/src/components/` | Sample components |
+| `test-project/basic-stencil/` | Test fixture project |
+| `test-project/basic-stencil/vitest.config.ts` | Uses defineVitestConfig |
+| `test-project/basic-stencil/src/components/` | Sample components |
 | `TESTING_GUIDE.md` | Comprehensive testing guide |
 
 ## Architecture Overview
@@ -277,7 +277,7 @@ describe('my-button', () => {
 │   ├── render.spec.ts       # Unit tests
 │   └── integration.spec.ts  # Integration tests
 │
-└── test-fixtures/           # Test projects
+└── test-project/           # Test projects
     └── basic-stencil/       # Stencil project
         ├── src/components/  # Test components
         │   ├── my-button/

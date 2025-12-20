@@ -12,7 +12,7 @@ export class MyCard {
   /**
    * Card title
    */
-  @Prop() title?: string;
+  @Prop() cardTitle?: string;
 
   /**
    * Card elevation (box-shadow depth)
@@ -33,9 +33,9 @@ export class MyCard {
           'card--interactive': this.interactive,
         }}
       >
-        {this.title && (
+        {this.cardTitle && (
           <div class="card__header">
-            <h3 class="card__title">{this.title}</h3>
+            <h3 class="card__title">{this.cardTitle}</h3>
             <slot name="header-actions" />
           </div>
         )}

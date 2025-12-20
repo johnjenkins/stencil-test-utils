@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * CLI helper for @stencil/testing
+ * CLI helper for @stencil/test-utils
  * 
  * Provides convenient commands for running tests:
  * - stencil-test --spec     (run only component tests)

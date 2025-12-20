@@ -2,6 +2,7 @@ import { Config } from '@stencil/core';
 
 export const config: Config = {
   namespace: 'test-components',
+  suppressReservedPublicNameWarnings: true,
   outputTargets: [
     {
       type: 'dist',
@@ -23,4 +24,5 @@ export const config: Config = {
   testing: {
     browserHeadless: true,
   },
+  sourceMap: false,
 };

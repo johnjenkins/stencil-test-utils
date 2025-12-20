@@ -1,12 +1,12 @@
 /**
- * Example test file showing how to use @stencil/testing
+ * Example test file showing how to use @stencil/test-utils
  * 
  * This would typically live in your component directory:
  * src/components/my-button/my-button.spec.tsx
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, type RenderResult } from '@stencil/testing';
+import { render, type RenderResult } from '@stencil/test-utils';
 import { h, Fragment } from '@stencil/core';
 
 // Mock component for demonstration

@@ -1,90 +1,114 @@
-# @stencil/testing
+# @stencil/test-utils
 
 First-class testing utilities for Stencil design systems, powered by Vitest.
 
 ## Features
 
 - 🚀 **Seamless Integration** - Works with your existing Stencil configuration
-- 🎯 **Multiple Environments** - Support for node, jsdom, happy-dom, and Stencil's mock-doc
+- 🎯 **Multiple Environments** - Support for mock-doc (Node) and browser testing with Playwright
 - 📦 **Flexible Loaders** - Use any Stencil output target (lazy, custom-elements, dist, hydrate)
-- 🔧 **Easy Configuration** - Pre-configured Vitest setup with sensible defaults
+- 🔧 **Easy Configuration** - Uses standard Vitest configuration with helpful Stencil defaults
 - 🧪 **Component Testing** - Focus on testing individual components with nested children
 - 📝 **Unified API** - Consistent testing experience across different environments
+- ✨ **Native Vitest Structure** - Works with Vitest's standard project configuration
 
 ## Installation
 
 ```bash
-npm install --save-dev @stencil/testing vitest
+npm install --save-dev @stencil/test-utils @stencil/core vitest @vitest/browser playwright
 ```
 
 ## Quick Start
 
 ### 1. Create a `vitest.config.ts`
 
+Use standard Vitest configuration with Stencil enhancements:
+
 ```typescript
-import { defineVitestConfig } from '@stencil/testing';
+import { defineVitestConfig } from '@stencil/test-utils/config';
 
 export default defineVitestConfig({
-  // Path to your Stencil config (optional)
+  // Optional: Path to your Stencil config
   stencilConfig: './stencil.config.ts',
   
-  // Test environment (default: 'mock-doc')
-  environment: 'mock-doc',
-  
-  // Test file patterns
-  patterns: {
-    spec: '**/*.spec.tsx',  // Component/unit tests
-    e2e: '**/*.e2e.tsx'     // Browser tests
+  test: {
+    // Define multiple test environments using Vitest's native project structure
+    projects: [
+      {
+        test: {
+          name: 'unit',
+          include: ['**/*.spec.tsx'],
+          environment: 'node',
+          setupFiles: ['@stencil/test-utils/mock-doc-setup'],
+        },
+      },
+      {
+        test: {
+          name: 'browser',
+          include: ['**/*.e2e.tsx'],
+          browser: {
+            enabled: true,
+            provider: 'playwright',
+            instances: [
+              { browser: 'chromium' }
+            ],
+          },
+        },
+      },
+    ],
   },
-  
-  // Loader configuration
-  loader: {
-    type: 'lazy',  // 'lazy' | 'custom-elements' | 'dist' | 'hydrate'
-    modulePath: './dist/esm/loader.js'  // Optional custom path
-  }
 });
 ```
 
 ### 2. Write Your First Test
 
+**Unit test with mock-doc:**
+
 ```typescript
 // src/components/my-component/my-component.spec.tsx
 import { describe, it, expect } from 'vitest';
-import { render } from '@stencil/testing';
-import { MyComponent } from './my-component';
+import { h } from '@stencil/core';
+import { render } from '@stencil/test-utils';
 
 describe('my-component', () => {
   it('renders with props', async () => {
-    const { root, waitForChanges } = await render(MyComponent, {
-      props: { name: 'World' }
-    });
-    
+    const { root } = await render(<my-component name="World" />);
     expect(root.textContent).toContain('Hello, World!');
   });
 
   it('updates on prop change', async () => {
-    const { root, setProps } = await render(MyComponent, {
-      props: { name: 'World' }
-    });
-    
+    const { root, setProps } = await render(<my-component name="World" />);
     await setProps({ name: 'Stencil' });
-    
     expect(root.textContent).toContain('Hello, Stencil!');
   });
+});
+```
+
+**Browser test:**
+
+```typescript
+// src/components/my-component/my-component.e2e.tsx
+import { expect, test } from 'vitest';
+import { render } from '@stencil/test-utils';
+import { h } from '@stencil/core';
+
+test('renders in real browser', async () => {
+  const { root } = await render(<my-component name="Browser" />);
+  expect(root.textContent).toContain('Hello, Browser!');
 });
 ```
 
 ### 3. Run Tests
 
 ```bash
-# Run all tests
+# Run all tests (both unit and browser)
 npx vitest
 
-# Run only spec tests
-npx vitest run --testNamePattern="spec"
+# Run only unit tests
+npx vitest --project unit
 
-# Run only e2e tests
-npx vitest run --testNamePattern="e2e"
+# Run only browser tests
+npx vitest --project browser
 
 # Watch mode
 npx vitest --watch
@@ -92,12 +116,20 @@ npx vitest --watch
 
 ## Configuration
 
+### Using Standard Vitest Projects
+
+The configuration uses Vitest's native project structure. The helper automatically adds:
+
+- JSX configuration (`jsxFactory: 'h'`, `jsxFragment: 'Fragment'`)
+- Default excludes (`node_modules`, `dist`, `build`, `.stencil`)
+- Global test APIs (`describe`, `it`, `expect`)
+
 ### Test Environments
 
 Choose the right environment for your tests:
 
-- **`mock-doc`** (default) - Stencil's built-in DOM implementation, fastest and most compatible
-- **`jsdom`** - Popular DOM implementation for Node.js
+- **`node` with mock-doc** - Stencil's built-in DOM implementation, fastest and most compatible
+- **`browser`** - Real browser testing with Playwright (chromium, firefox, webkit)
 - **`happy-dom`** - Lighter, faster alternative to jsdom
 - **`node`** - Minimal Node.js environment (no DOM)
 
@@ -213,7 +245,7 @@ await page.waitForChanges();
 Manually setup the component loader.
 
 ```typescript
-import { setupLoader } from '@stencil/testing';
+import { setupLoader } from '@stencil/test-utils';
 
 // In a setup file or before tests
 await setupLoader({
@@ -229,7 +261,7 @@ await setupLoader({
 Merge additional Vitest configuration:
 
 ```typescript
-import { defineVitestConfig } from '@stencil/testing';
+import { defineVitestConfig } from '@stencil/test-utils';
 
 export default defineVitestConfig(
   {

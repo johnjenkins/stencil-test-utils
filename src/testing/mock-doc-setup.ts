@@ -18,7 +18,6 @@ let doc: any;
 
 if (!isNodeEnvironment) {
   // We're in a real browser, skip mock-doc setup and export real globals
-  console.warn('[mock-doc-setup] Skipping mock-doc setup - running in real browser environment');
   win = typeof window !== 'undefined' ? window : undefined;
   doc = typeof document !== 'undefined' ? document : undefined;
 } else {
@@ -56,3 +55,5 @@ if (!isNodeEnvironment) {
 // Export the mock window for use in custom setup
 export { win, doc };
 
+// Import matchers to auto-install them
+import './matchers.js';

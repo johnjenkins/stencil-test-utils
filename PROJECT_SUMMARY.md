@@ -1,8 +1,8 @@
-# @stencil/testing - Project Summary
+# @stencil/test-utils - Project Summary
 
 ## Overview
 
-`@stencil/testing` is a comprehensive testing package for Stencil design systems, providing first-class integration with Vitest. It enables seamless component testing with support for multiple environments and testing approaches.
+`@stencil/test-utils` is a comprehensive testing package for Stencil design systems, providing first-class integration with Vitest. It enables seamless component testing with support for multiple environments and testing approaches.
 
 ## Project Status
 
@@ -127,7 +127,7 @@ packages/testing/
 
 ```typescript
 // vitest.config.ts
-import { defineVitestConfig } from '@stencil/testing';
+import { defineVitestConfig } from '@stencil/test-utils';
 
 export default defineVitestConfig({
   stencilConfig: './stencil.config.ts',
@@ -144,7 +144,7 @@ export default defineVitestConfig({
 
 ```typescript
 // my-component.spec.tsx
-import { render } from '@stencil/testing';
+import { render } from '@stencil/test-utils';
 import { MyComponent } from './my-component';
 
 it('renders correctly', async () => {

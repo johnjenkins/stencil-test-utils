@@ -1,16 +1,16 @@
-# @stencil/testing - Quick Reference
+# @stencil/test-utils - Quick Reference
 
 ## Installation
 
 ```bash
-npm install --save-dev @stencil/testing vitest
+npm install --save-dev @stencil/test-utils vitest
 ```
 
 ## Setup
 
 **vitest.config.ts**
 ```typescript
-import { defineVitestConfig } from '@stencil/testing';
+import { defineVitestConfig } from '@stencil/test-utils';
 
 export default defineVitestConfig({
   stencilConfig: './stencil.config.ts',
@@ -25,7 +25,7 @@ export default defineVitestConfig({
 ## Basic Testing
 
 ```typescript
-import { render } from '@stencil/testing';
+import { render } from '@stencil/test-utils';
 import { MyComponent } from './my-component';
 
 // Render component

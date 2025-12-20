@@ -19,9 +19,13 @@
       "types": "./dist/testing/mock-doc-setup.d.ts",
       "import": "./dist/testing/mock-doc-setup.js"
     },
-    "./browser": {
-      "types": "./dist/testing/browser-render.d.ts",
-      "import": "./dist/testing/browser-render.js"
+    "./jsdom-setup": {
+      "types": "./dist/testing/jsdom-setup.d.ts",
+      "import": "./dist/testing/jsdom-setup.js"
+    },
+    "./happy-dom-setup": {
+      "types": "./dist/testing/happy-dom-setup.d.ts",
+      "import": "./dist/testing/happy-dom-setup.js"
     }
   },
   "files": [
@@ -69,7 +73,7 @@
     "test": "vitest",
     "test:unit": "vitest run tests",
     "test:integration": "pnpm test:integration:build && pnpm test:integration:run",
-    "test:integration:build": "cd test-fixtures/basic-stencil && pnpm install && pnpm build",
+    "test:integration:build": "cd test-project/basic-stencil && pnpm install && pnpm build",
     "test:integration:run": "vitest run tests/integration.spec.ts",
     "test:coverage": "vitest run --coverage"
   },

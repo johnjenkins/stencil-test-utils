@@ -64,4 +64,4 @@ describe('Integration', () => {
 
 ## Test Fixtures
 
-Integration tests use fixtures in `test-fixtures/` directory. See `test-fixtures/README.md` for more information.
+Integration tests use fixtures in `test-project/` directory. See `test-project/README.md` for more information.

@@ -1,4 +1,4 @@
-# @stencil/testing Development
+# @stencil/test-utils Development
 
 ## Project Structure
 

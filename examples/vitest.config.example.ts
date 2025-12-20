@@ -4,7 +4,7 @@
  * Users would place this in their project root as vitest.config.ts
  */
 
-import { defineVitestConfig } from '@stencil/testing';
+import { defineVitestConfig } from '@stencil/test-utils';
 
 export default defineVitestConfig(
   {

@@ -6,11 +6,19 @@ import type { RenderOptions, RenderResult } from '../types.js';
  * Use the same detection logic as mock-doc-setup
  */
 function isBrowserEnvironment(): boolean {
-  // Check for Node.js environment (means we're in mock-doc or jsdom/happy-dom)
+  // Check for Node.js environment
   const isNodeEnvironment = typeof process !== 'undefined' && 
     process?.versions?.node !== undefined;
   
-  // If we're in Node.js, we're NOT in a real browser
+  // If we're in Node.js, check if we're using jsdom/happy-dom with lazy loader
+  // jsdom/happy-dom will have window.customElements even in Node
+  if (isNodeEnvironment && typeof window !== 'undefined' && typeof customElements !== 'undefined') {
+    // We're in jsdom/happy-dom with lazy components loaded
+    // Use browser rendering path
+    return true;
+  }
+  
+  // If we're in Node.js without window, we're in mock-doc
   return !isNodeEnvironment;
 }
 
@@ -49,7 +57,6 @@ async function renderInBrowser<T extends HTMLElement = HTMLElement>(
   vnode: any,
   options: RenderOptions = {}
 ): Promise<RenderResult<T>> {
-  // Dynamically import Stencil's render to avoid issues in Node
 
   // Use Stencil's render which handles VNodes properly in the browser
   const container = document.createElement('div');
@@ -69,18 +76,47 @@ async function renderInBrowser<T extends HTMLElement = HTMLElement>(
     await (element as any).componentOnReady();
   }
   
-  const waitForChanges = async () => {
-    await new Promise(resolve => setTimeout(resolve, 0));
-    if (typeof (element as any).forceUpdate === 'function') {
-      await (element as any).forceUpdate();
-    }
-  };
+  function waitForChanges(documentElement = document.documentElement) {
+    return new Promise<void>((resolve) => {
+      // Wait for Stencil's RAF-based update cycle
+      // Use multiple RAF cycles to ensure all batched updates complete
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const promiseChain = [];
+          const waitComponentOnReady = (elm, promises) => {
+            if ("shadowRoot" in elm && elm.shadowRoot instanceof ShadowRoot) {
+              waitComponentOnReady(elm.shadowRoot, promises);
+            }
+            const children = elm.children;
+            const len = children.length;
+            for (let i = 0; i < len; i++) {
+              const childElm = children[i];
+              const childStencilElm = childElm;
+              if (childElm.tagName.includes("-") && typeof childStencilElm.componentOnReady === "function") {
+                promises.push(childStencilElm.componentOnReady().then(() => {
+                }));
+              }
+              waitComponentOnReady(childElm, promises);
+            }
+          };
+          waitComponentOnReady(documentElement, promiseChain);
+          Promise.all(promiseChain).then(() => resolve()).catch(() => resolve());
+        });
+      });
+    });
+  }
   
   const setProps = async (newProps: Record<string, any>) => {
     Object.entries(newProps).forEach(([key, value]) => {
       (element as any)[key] = value;
     });
-    await waitForChanges();
+    
+    // Wait for multiple RAF cycles to ensure Stencil's batched updates complete
+    // Stencil batches updates using requestAnimationFrame for performance
+    await waitForChanges(container);
+    
+    // Additional RAF cycle to ensure rendering is complete
+    await new Promise(resolve => requestAnimationFrame(() => resolve(undefined)));
   };
   
   const unmount = () => {

@@ -22,7 +22,7 @@ describe('my-card - spec tests', () => {
 
     it('should render title when provided', async () => {
       result = await render(
-        <my-card title="Test Card">
+        <my-card cardTitle="Test Card">
           <p>Content</p>
         </my-card>
       );
@@ -45,7 +45,7 @@ describe('my-card - spec tests', () => {
       const shadowRoot = result.root.shadowRoot;
       const header = shadowRoot!.querySelector('.card__header');
       
-      // Header should not be rendered when no title
+      // Header should not be rendered when no cardTitle
       expect(header).toBeNull();
     });
 
@@ -121,7 +121,7 @@ describe('my-card - spec tests', () => {
   describe('slots', () => {
     it('should render footer slot when provided', async () => {
       result = await render(
-        <my-card title="Card">
+        <my-card cardTitle="Card">
           <p>Content</p>
           <div slot="footer">Footer content</div>
         </my-card>
@@ -136,7 +136,7 @@ describe('my-card - spec tests', () => {
 
     it('should render header-actions slot', async () => {
       result = await render(
-        <my-card title="Card">
+        <my-card cardTitle="Card">
           <button slot="header-actions">Action</button>
           <p>Content</p>
         </my-card>
@@ -152,9 +152,9 @@ describe('my-card - spec tests', () => {
 
   describe('props updates', () => {
     it('should update title', async () => {
-      result = await render(<my-card title="Initial" />);
+      result = await render(<my-card cardTitle="Initial" />);
       
-      await result.setProps({ title: 'Updated' });
+      await result.setProps({ cardTitle: 'Updated' });
       await result.waitForChanges();
       
       const shadowRoot = result.root.shadowRoot;

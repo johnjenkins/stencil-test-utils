@@ -1,6 +1,6 @@
-# @stencil/testing Examples
+# @stencil/test-utils Examples
 
-This directory contains examples of how to use `@stencil/testing` in different scenarios.
+This directory contains examples of how to use `@stencil/test-utils` in different scenarios.
 
 ## Files
 
@@ -25,7 +25,7 @@ Fast, lightweight tests that run in a Node environment with DOM emulation:
 
 ```typescript
 // my-component.spec.tsx
-import { render } from '@stencil/testing';
+import { render } from '@stencil/test-utils';
 import { MyComponent } from './my-component';
 
 it('renders correctly', async () => {
@@ -51,7 +51,7 @@ Real browser tests for visual, interaction, and integration testing:
 
 ```typescript
 // my-component.e2e.tsx
-import { render } from '@stencil/testing';
+import { render } from '@stencil/test-utils';
 import { MyComponent } from './my-component';
 
 it('is keyboard accessible', async () => {

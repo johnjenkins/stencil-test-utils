@@ -20,7 +20,7 @@
 @stencil/test-utils/
 ├── 📦 src/                          Your package source code
 ├── 🧪 tests/                        Unit & integration tests
-├── 🎯 test-fixtures/               Test Stencil projects
+├── 🎯 test-project/               Test Stencil projects
 │   └── basic-stencil/              Complete Stencil app with tests
 └── 📚 Documentation files          Guides and references
 ```
@@ -49,7 +49,7 @@ pnpm test -- --watch           # Watch mode
 
 ### Work with Fixture
 ```bash
-cd test-fixtures/basic-stencil
+cd test-project/basic-stencil
 
 pnpm test                      # All fixture tests
 pnpm test --run *.spec         # Only component tests
@@ -126,7 +126,7 @@ it('should render button', async () => {
 
 ### Add a New Component to Fixture
 ```bash
-cd test-fixtures/basic-stencil/src/components
+cd test-project/basic-stencil/src/components
 
 # Create component directory
 mkdir my-new-component
@@ -153,7 +153,7 @@ pnpm test -t "test name" --reporter=verbose
 pnpm test --watch
 
 # Check fixture build
-cd test-fixtures/basic-stencil
+cd test-project/basic-stencil
 pnpm build
 ls -la dist/
 ```
@@ -175,7 +175,7 @@ open coverage/index.html
 ## Next Steps
 
 1. ✅ **Run the tests** - `./test-setup.sh`
-2. ✅ **Explore the fixture** - `cd test-fixtures/basic-stencil`
+2. ✅ **Explore the fixture** - `cd test-project/basic-stencil`
 3. ✅ **Review test examples** - Look at `*.spec.tsx` files
 4. ⏳ **Add more tests** - Test different scenarios
 5. ⏳ **Add browser tests** - Implement playwright/wdio

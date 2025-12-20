@@ -5,7 +5,7 @@
 ### Test Fixture Files (12 files)
 
 ```
-test-fixtures/
+test-project/
 ├── README.md                                              [Fixture documentation]
 └── basic-stencil/
     ├── .gitignore                                        [Git ignore rules]
@@ -88,7 +88,7 @@ tests/
 
 ## File Purposes
 
-### Test Fixture (`test-fixtures/basic-stencil/`)
+### Test Fixture (`test-project/basic-stencil/`)
 
 **Purpose:** A real Stencil project to validate that @stencil/test-utils works correctly
 
@@ -136,7 +136,7 @@ pnpm test:integration       # Integration tests only
 pnpm test:coverage          # With coverage report
 
 # Fixture tests directly
-cd test-fixtures/basic-stencil
+cd test-project/basic-stencil
 pnpm test                   # All fixture tests
 pnpm test --run *.spec      # Only spec tests
 pnpm test --run *.e2e       # Only e2e tests
@@ -146,7 +146,7 @@ pnpm test --run *.e2e       # Only e2e tests
 
 ### ✅ defineVitestConfig API
 ```typescript
-// test-fixtures/basic-stencil/vitest.config.ts
+// test-project/basic-stencil/vitest.config.ts
 export default defineVitestConfig({
   stencilConfig: './stencil.config.ts',  // Uses Stencil config
   environment: 'mock-doc',               // Default: mock-doc
@@ -212,12 +212,12 @@ The fixture and tests validate that your package can:
 
 2. **Explore the fixture:**
    ```bash
-   cd test-fixtures/basic-stencil
+   cd test-project/basic-stencil
    pnpm test
    ```
 
 3. **Review the tests:**
-   - Open `test-fixtures/basic-stencil/src/components/my-button/my-button.spec.tsx`
+   - Open `test-project/basic-stencil/src/components/my-button/my-button.spec.tsx`
    - See real examples of using your API
 
 4. **Extend the tests:**

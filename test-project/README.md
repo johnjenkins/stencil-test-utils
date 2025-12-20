@@ -20,7 +20,7 @@ A basic Stencil project with sample components used for integration testing.
 ### Building a Fixture
 
 ```bash
-cd test-fixtures/basic-stencil
+cd test-project/basic-stencil
 pnpm install
 pnpm build
 ```
@@ -28,7 +28,7 @@ pnpm build
 ### Running Fixture Tests
 
 ```bash
-cd test-fixtures/basic-stencil
+cd test-project/basic-stencil
 pnpm test
 ```
 
@@ -40,7 +40,7 @@ The parent package's integration tests use these fixtures to validate that `@ste
 
 To add a new test fixture:
 
-1. Create a new directory: `test-fixtures/your-fixture-name`
+1. Create a new directory: `test-project/your-fixture-name`
 2. Set up a Stencil project with `stencil.config.ts`
 3. Add `vitest.config.ts` using `defineVitestConfig` from `@stencil/test-utils`
 4. Create components and tests

@@ -70,7 +70,7 @@ describe('my-button - spec tests', () => {
       const shadowRoot = result.root.shadowRoot;
       const button = shadowRoot!.querySelector('button');
       
-      expect(button?.disabled).toBe(true);
+      expect(button?.hasAttribute('disabled')).toBe(true);
     });
 
     it('should update size prop', async () => {

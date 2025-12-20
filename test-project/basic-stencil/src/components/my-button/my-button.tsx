@@ -39,7 +39,7 @@ export class MyButton {
     return (
       <button
         class={`button button--${this.variant} button--${this.size}`}
-        disabled={this.disabled}
+        disabled={this.disabled ? true : undefined}
         onClick={this.handleClick}
         type="button"
       >
