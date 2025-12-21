@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const FIXTURE_DIR = join(__dirname, '../test-project/basic-stencil');
+const FIXTURE_DIR = join(__dirname, '../test-project');
 
 describe('Integration Tests - Basic Stencil Fixture', () => {
   beforeAll(() => {

@@ -1,6 +1,36 @@
 import type { Config as StencilConfig } from '@stencil/core/internal';
 
 /**
+ * Event spy for testing custom events
+ */
+export interface EventSpy {
+  /**
+   * Name of the event being spied on
+   */
+  eventName: string;
+  
+  /**
+   * All events that have been received
+   */
+  events: CustomEvent[];
+  
+  /**
+   * First event received (if any)
+   */
+  firstEvent: CustomEvent | undefined;
+  
+  /**
+   * Last event received (if any)
+   */
+  lastEvent: CustomEvent | undefined;
+  
+  /**
+   * Number of events received
+   */
+  length: number;
+}
+
+/**
  * Component render options
  */
 export interface RenderOptions {
@@ -59,4 +89,9 @@ export interface RenderResult<T = HTMLElement> {
    * Unmount/cleanup the component
    */
   unmount: () => void;
+  
+  /**
+   * Spy on a custom event
+   */
+  spyOnEvent: (eventName: string) => EventSpy;
 }

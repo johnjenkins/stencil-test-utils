@@ -1,14 +1,13 @@
 {
-  "name": "basic-stencil-fixture",
+  "name": "test-project",
   "version": "0.0.1",
   "private": true,
   "type": "module",
   "description": "Test fixture for @stencil/test-utils",
   "scripts": {
     "build": "stencil build --prod",
-    "start": "stencil build --watch",
-    "test": "vitest",
-    "test:browser": "vitest --config vitest.browser.config.ts"
+    "start": "stencil build --watch --serve",
+    "test": "stencil-test"
   },
   "dependencies": {
     "@stencil/core": "^4.0.0"

@@ -1,0 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`my-button - browser tests > visual regression > should match screenshot for all variants > button-all-variants.png 1`] = `"/Users/John.Jenkins/projects/stencil-test-utils/test-project/src/components/my-button/__screenshots__/my-button.e2e.tsx/my-button---browser-tests-visual-regression-should-match-screenshot-for-all-variants-1.png"`;
+
+exports[`my-button - browser tests > visual regression > should match screenshot for default variant > button-default.png 1`] = `"/Users/John.Jenkins/projects/stencil-test-utils/test-project/src/components/my-button/__screenshots__/my-button.e2e.tsx/my-button---browser-tests-visual-regression-should-match-screenshot-for-default-variant-1.png"`;
+
+exports[`my-button - browser tests > visual regression > should match screenshot for primary variant > button-primary.png 1`] = `"/Users/John.Jenkins/projects/stencil-test-utils/test-project/src/components/my-button/__screenshots__/my-button.e2e.tsx/my-button---browser-tests-visual-regression-should-match-screenshot-for-primary-variant-1.png"`;

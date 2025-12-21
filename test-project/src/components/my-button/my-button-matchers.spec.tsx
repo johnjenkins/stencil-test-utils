@@ -20,11 +20,12 @@ describe('my-button - custom matchers', () => {
 
       expect(root).toEqualHtml(`
         <my-button class="hydrated">
-          <template shadowrootmode="open">
-            <button class="button button--medium button--primary" type="button">
+          <mock:shadow-root>
+            <button class="button button--primary button--medium" type="button">
               <slot></slot>
             </button>
-          </template>
+          </mock:shadow-root>
+          Click me
         </my-button>
       `);
     });
@@ -38,11 +39,12 @@ describe('my-button - custom matchers', () => {
 
       expect(root).toEqualHtml(`
         <my-button class="hydrated">
-          <template shadowrootmode="open">
+          <mock:shadow-root>
             <button class="button button--secondary button--small" type="button">
               <slot></slot>
             </button>
-          </template>
+          </mock:shadow-root>
+          Small
         </my-button>
       `);
     });
@@ -56,11 +58,12 @@ describe('my-button - custom matchers', () => {
 
       expect(root).toEqualHtml(`
         <my-button class="hydrated">
-          <template shadowrootmode="open">
-            <button class="button button--medium button--primary" disabled="" type="button">
+          <mock:shadow-root>
+            <button class="button button--primary button--medium" disabled="" type="button">
               <slot></slot>
             </button>
-          </template>
+          </mock:shadow-root>
+          Disabled
         </my-button>
       `);
     });
@@ -75,11 +78,11 @@ describe('my-button - custom matchers', () => {
       expect(() => {
         expect(root).toEqualHtml(`
           <my-button>
-            <template shadowrootmode="open">
+            <mock:shadow-root>
               <button class="wrong-class">
                 <slot></slot>
               </button>
-            </template>
+            </mock:shadow-root>
           </my-button>
         `);
       }).toThrow();
@@ -96,6 +99,7 @@ describe('my-button - custom matchers', () => {
 
       expect(root).toEqualLightHtml(`
         <my-button class="hydrated">
+          Click me
         </my-button>
       `);
     });
@@ -109,7 +113,9 @@ describe('my-button - custom matchers', () => {
 
       expect(root).toEqualLightHtml(`
         <my-button class="hydrated">
-          <span></span>
+          <span>
+            Slotted content
+          </span>
         </my-button>
       `);
     });
@@ -124,6 +130,7 @@ describe('my-button - custom matchers', () => {
       // This should NOT include the <button> from shadow DOM
       expect(root).toEqualLightHtml(`
         <my-button class="hydrated">
+          Test
         </my-button>
       `);
     });
@@ -157,7 +164,7 @@ describe('my-button - custom matchers', () => {
 
       expect(root).toEqualHtml(`
         <my-card class="hydrated">
-          <template shadowrootmode="open">
+          <mock:shadow-root>
             <div class="card card--elevation-1">
               <div class="card__header">
                 <h3 class="card__title">
@@ -172,15 +179,14 @@ describe('my-button - custom matchers', () => {
                 <slot name="footer"></slot>
               </div>
             </div>
-          </template>
-          <p></p>
-          <my-button class="hydrated" slot="footer" variant="primary">
-            <template shadowrootmode="open">
-              <button class="button button--medium button--primary" type="button">
+          </mock:shadow-root>
+          <p> Card content </p>
+          <my-button slot="footer" class="hydrated">
+            <mock:shadow-root>
+              <button class="button button--primary button--medium" type="button">
                 <slot></slot>
               </button>
-            </template>
-          </my-button>
+            </mock:shadow-root> Action </my-button>
         </my-card>
       `);
     });

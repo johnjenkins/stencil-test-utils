@@ -29,7 +29,7 @@ echo ""
 
 # Step 3: Build test fixture
 echo -e "${BLUE}Step 3: Building test fixture...${NC}"
-cd test-project/basic-stencil
+cd test-project
 pnpm install
 pnpm build
 cd ../..
@@ -56,7 +56,7 @@ echo -e "${GREEN}=====================================${NC}"
 echo ""
 echo "Next steps:"
 echo "  • View test coverage: pnpm test:coverage"
-echo "  • Run fixture tests: cd test-project/basic-stencil && pnpm test"
+echo "  • Run fixture tests: cd test-project && pnpm test"
 echo "  • Watch mode: pnpm test --watch"
 echo "  • See TESTING_GUIDE.md for more options"
 echo ""

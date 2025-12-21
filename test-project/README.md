@@ -1,56 +1,43 @@
-# Test Fixtures
+# Basic Stencil Test Fixture
 
-This directory contains test fixtures for validating `@stencil/test-utils` functionality.
+This is a test fixture for `@stencil/test-utils` that contains a basic Stencil project with sample components.
 
-## Structure
+## Components
 
-### basic-stencil
-A basic Stencil project with sample components used for integration testing.
+### my-button
+A simple button component with:
+- Variants: primary, secondary, danger
+- Sizes: small, medium, large
+- Disabled state
+- Click event emission
 
-**Components:**
-- `my-button` - Button component with variants, sizes, and events
-- `my-card` - Card component with slots and elevation
+### my-card
+A card component with:
+- Optional title
+- Elevation levels (0-3)
+- Interactive mode
+- Slots: default, footer, header-actions
 
-**Test Files:**
-- `*.spec.tsx` - Component tests (node DOM environment)
-- `*.e2e.tsx` - Browser tests (browser environment)
+## Testing
 
-## Usage
+This fixture includes both spec and e2e tests for each component:
 
-### Building a Fixture
+- `*.spec.tsx` - Component/unit tests (run in node DOM environment)
+- `*.e2e.tsx` - Browser-based tests (run in real browser environment)
+
+## Setup
 
 ```bash
-cd test-project/basic-stencil
+# Install dependencies
 pnpm install
+
+# Build Stencil components
 pnpm build
-```
 
-### Running Fixture Tests
-
-```bash
-cd test-project/basic-stencil
+# Run tests
 pnpm test
 ```
 
-### Using in Integration Tests
+## Usage in Integration Tests
 
-The parent package's integration tests use these fixtures to validate that `@stencil/test-utils` works correctly with real Stencil projects.
-
-## Adding New Fixtures
-
-To add a new test fixture:
-
-1. Create a new directory: `test-project/your-fixture-name`
-2. Set up a Stencil project with `stencil.config.ts`
-3. Add `vitest.config.ts` using `defineVitestConfig` from `@stencil/test-utils`
-4. Create components and tests
-5. Add integration tests in `tests/integration.spec.ts`
-
-## Fixture Requirements
-
-Each fixture should:
-- Have a valid `stencil.config.ts`
-- Use `defineVitestConfig` from `@stencil/test-utils`
-- Include at least one component
-- Include both `.spec.tsx` and `.e2e.tsx` test files
-- Have a README explaining the fixture's purpose
+This fixture is used by the parent `@stencil/test-utils` package to test its functionality.

@@ -1,5 +1,6 @@
 /**
  * Component tests for my-button using @stencil/test-utils
+ * Testing file watcher
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, type RenderResult } from '@stencil/test-utils';

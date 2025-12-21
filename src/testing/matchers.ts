@@ -5,20 +5,33 @@
  */
 
 import { expect } from 'vitest';
+import { serializeHtml, normalizeHtml, prettifyHtml } from './html-serializer.js';
+import type { EventSpy } from '../types.js';
 
 /**
  * Custom matchers interface
  */
 interface CustomMatchers<R = unknown> {
   toHaveClass(className: string): R;
+  toHaveClasses(classNames: string[]): R;
+  toMatchClasses(classNames: string[]): R;
   toHaveAttribute(attribute: string, value?: string): R;
+  toEqualAttribute(attribute: string, value: string): R;
+  toEqualAttributes(expectedAttrs: Record<string, string>): R;
   toHaveProperty(property: string, value?: any): R;
   toHaveTextContent(text: string): R;
+  toEqualText(expectedText: string): R;
   toBeVisible(): R;
   toHaveShadowRoot(): R;
   toEmitEvent(eventName: string): R;
   toEqualHtml(expectedHtml: string): R;
   toEqualLightHtml(expectedHtml: string): R;
+  toHaveReceivedEvent(): R;
+  toHaveReceivedEventTimes(count: number): R;
+  toHaveReceivedEventDetail(detail: any): R;
+  toHaveFirstReceivedEventDetail(detail: any): R;
+  toHaveLastReceivedEventDetail(detail: any): R;
+  toHaveNthReceivedEventDetail(index: number, detail: any): R;
 }
 
 // Extend Vitest types if available
@@ -44,6 +57,60 @@ export function toHaveClass(
       pass
         ? `Expected element not to have class "${className}"`
         : `Expected element to have class "${className}"`,
+  };
+}
+
+/**
+ * Check if element has multiple classes
+ * Checks if element has all of the specified CSS classes (order doesn't matter)
+ */
+export function toHaveClasses(
+  received: HTMLElement,
+  classNames: string[]
+): { pass: boolean; message: () => string } {
+  const missingClasses: string[] = [];
+  
+  for (const className of classNames) {
+    if (!received.classList.contains(className)) {
+      missingClasses.push(className);
+    }
+  }
+  
+  const pass = missingClasses.length === 0;
+  const actualClasses = Array.from(received.classList).join(', ');
+  
+  return {
+    pass,
+    message: () =>
+      pass
+        ? `Expected element not to have classes [${classNames.join(', ')}]`
+        : `Expected element to have classes [${classNames.join(', ')}], but missing [${missingClasses.join(', ')}]. Actual classes: [${actualClasses}]`,
+  };
+}
+
+/**
+ * Check if element has exactly the specified CSS classes (no more, no less)
+ * Order doesn't matter, but the element must have exactly these classes
+ */
+export function toMatchClasses(
+  received: HTMLElement,
+  classNames: string[]
+): { pass: boolean; message: () => string } {
+  // Get classes from the class attribute to support mock-doc
+  const classAttr = received.getAttribute('class') || '';
+  const actualClasses = classAttr.split(/\s+/).filter(Boolean).sort();
+  const expectedClasses = [...classNames].filter(Boolean).sort();
+  
+  const pass = 
+    actualClasses.length === expectedClasses.length &&
+    actualClasses.every((cls, idx) => cls === expectedClasses[idx]);
+  
+  return {
+    pass,
+    message: () =>
+      pass
+        ? `Expected element not to have exactly classes [${classNames.join(', ')}]`
+        : `Expected element to have exactly classes [${classNames.join(', ')}], but got [${actualClasses.join(', ')}]`,
   };
 }
 
@@ -80,6 +147,64 @@ export function toHaveAttribute(
   return {
     pass: true,
     message: () => `Expected element not to have attribute "${attribute}"`,
+  };
+}
+
+/**
+ * Check if element has a specific attribute with an exact value
+ */
+export function toEqualAttribute(
+  received: HTMLElement,
+  attribute: string,
+  value: string
+): { pass: boolean; message: () => string } {
+  const actualValue = received.getAttribute(attribute);
+  const pass = actualValue === value;
+  
+  return {
+    pass,
+    message: () =>
+      pass
+        ? `Expected element attribute "${attribute}" not to equal "${value}"`
+        : `Expected element attribute "${attribute}" to equal "${value}", but got "${actualValue}"`,
+  };
+}
+
+/**
+ * Check if element has all expected attributes with exact values
+ */
+export function toEqualAttributes(
+  received: HTMLElement,
+  expectedAttrs: Record<string, string>
+): { pass: boolean; message: () => string } {
+  const mismatches: string[] = [];
+  const actualAttrs: Record<string, string | null> = {};
+  
+  // Collect all actual attributes
+  for (let i = 0; i < received.attributes.length; i++) {
+    const attr = received.attributes[i];
+    actualAttrs[attr.name] = attr.value;
+  }
+  
+  // Check expected attributes
+  for (const [name, expectedValue] of Object.entries(expectedAttrs)) {
+    const actualValue = received.getAttribute(name);
+    
+    if (actualValue === null) {
+      mismatches.push(`missing "${name}"`);
+    } else if (actualValue !== expectedValue) {
+      mismatches.push(`"${name}": expected "${expectedValue}", got "${actualValue}"`);
+    }
+  }
+  
+  const pass = mismatches.length === 0;
+  
+  return {
+    pass,
+    message: () =>
+      pass
+        ? `Expected element not to have attributes ${JSON.stringify(expectedAttrs)}`
+        : `Expected element attributes to match.\nMismatches: ${mismatches.join(', ')}\nExpected: ${JSON.stringify(expectedAttrs)}\nActual: ${JSON.stringify(actualAttrs)}`,
   };
 }
 
@@ -139,6 +264,26 @@ export function toHaveTextContent(
 }
 
 /**
+ * Check if element's text content exactly matches (after trimming)
+ */
+export function toEqualText(
+  received: HTMLElement,
+  expectedText: string
+): { pass: boolean; message: () => string } {
+  const actualText = (received.textContent || '').trim();
+  const trimmedExpected = expectedText.trim();
+  const pass = actualText === trimmedExpected;
+  
+  return {
+    pass,
+    message: () =>
+      pass
+        ? `Expected element text not to equal "${trimmedExpected}"`
+        : `Expected element text to equal "${trimmedExpected}", but got "${actualText}"`,
+  };
+}
+
+/**
  * Check if element is visible
  */
 export function toBeVisible(
@@ -174,134 +319,6 @@ export function toHaveShadowRoot(
         ? `Expected element not to have shadow root`
         : `Expected element to have shadow root`,
   };
-}
-
-/**
- * Serialize HTML element to string
- * Works across mock-doc, jsdom, and happy-dom environments
- */
-function serializeHtml(
-  input: HTMLElement | ShadowRoot | DocumentFragment,
-  options: {
-    serializeShadowRoot?: boolean;
-    pretty?: boolean;
-    excludeStyles?: boolean;
-  } = {}
-): string {
-  const { serializeShadowRoot = true, pretty = true, excludeStyles = true } = options;
-
-  // Try to use mock-doc serializer if available (best option)
-  try {
-    const mockDoc = require('@stencil/core/mock-doc');
-    if (mockDoc.serializeNodeToHtml) {
-      let html = mockDoc.serializeNodeToHtml(input, {
-        prettyHtml: pretty,
-        outerHtml: true,
-        serializeShadowRoot,
-        excludeTags: ['body'],
-        removeHtmlComments: false,
-      });
-      
-      // Remove style tags if requested
-      if (excludeStyles) {
-        html = html.replace(/<style[^>]*>[\s\S]*?<\/style>\s*/gi, '');
-      }
-      
-      return html;
-    }
-  } catch {
-    // mock-doc not available, use manual serialization
-  }
-
-  // Fallback: Manual serialization for jsdom/happy-dom
-  let html = '';
-  
-  if ('innerHTML' in input) {
-    html = (input as HTMLElement).outerHTML || (input as any).innerHTML || '';
-  } else if ('innerHTML' in (input as any)) {
-    html = (input as any).innerHTML || '';
-  }
-  
-  // Remove style tags if requested
-  if (excludeStyles) {
-    html = html.replace(/<style[^>]*>[\s\S]*?<\/style>\s*/gi, '');
-  }
-
-  // Serialize shadow DOM if requested
-  if (serializeShadowRoot && 'shadowRoot' in input && input.shadowRoot) {
-    const shadowHtml = input.shadowRoot.innerHTML;
-    // Insert shadow content in a template tag to represent shadow DOM
-    html = html.replace('</host>', `<template shadowrootmode="open">${shadowHtml}</template></host>`);
-  }
-
-  if (pretty) {
-    return prettifyHtml(html);
-  }
-
-  return html;
-}
-
-/**
- * Custom HTML prettifier
- */
-function prettifyHtml(html: string): string {
-  const indentSize = 2;
-  let indentLevel = 0;
-  const lines: string[] = [];
-
-  // Normalize whitespace and collapse empty tags
-  html = html.replace(/\s+/g, ' ').replace(/>\s*</g, '><').trim();
-  // Keep empty tags on one line
-  html = html.replace(/<(\w+)([^>]*)>\s*<\/\1>/g, '<$1$2></$1>');
-
-  // Split on tag boundaries
-  const parts = html.split(/(<[^>]*>)/);
-  
-  let i = 0;
-  while (i < parts.length) {
-    const part = parts[i].trim();
-    i++;
-    
-    if (!part) continue;
-
-    if (part.startsWith('<')) {
-      // This is a tag
-      if (part.startsWith('</')) {
-        // Closing tag
-        // Check if previous line was the opening tag (empty element)
-        const tagName = part.match(/<\/(\w+)/)?.[1];
-        const lastLine = lines[lines.length - 1];
-        if (lastLine && tagName && lastLine.trim().match(new RegExp(`^<${tagName}[^>]*>$`))) {
-          // Empty element - append closing tag to same line
-          lines[lines.length - 1] = lastLine + part;
-        } else {
-          // Decrease indent before adding
-          indentLevel = Math.max(0, indentLevel - 1);
-          lines.push(' '.repeat(indentLevel * indentSize) + part);
-        }
-      } else if (part.endsWith('/>')) {
-        // Self-closing tag
-        lines.push(' '.repeat(indentLevel * indentSize) + part);
-      } else {
-        // Opening tag
-        lines.push(' '.repeat(indentLevel * indentSize) + part);
-        
-        // Check if this is a void element
-        const voidElements = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
-        const tagName = part.match(/<(\w+)/)?.[1]?.toLowerCase();
-        if (!tagName || !voidElements.includes(tagName)) {
-          indentLevel++;
-        }
-      }
-    } else {
-      // Text content
-      if (part) {
-        lines.push(' '.repeat(indentLevel * indentSize) + part);
-      }
-    }
-  }
-
-  return lines.join('\n');
 }
 
 /**
@@ -361,12 +378,17 @@ export function toEqualHtml(
     );
   }
 
-  // Parse and serialize expected HTML for consistent formatting  
-  const expectedFragment = parseHtmlFragment(expected);
-  let expectedHtml = (expectedFragment as any).innerHTML || expectedFragment.textContent || '';
-  // Normalize whitespace for comparison - collapse multiple spaces/newlines
-  expectedHtml = expectedHtml.replace(/\s+/g, ' ').replace(/>\s+</g, '><').trim();
-  receivedHtml = receivedHtml.replace(/\s+/g, ' ').replace(/>\s+</g, '><').trim();
+  // Parse and serialize expected HTML for consistent formatting
+  // For expected HTML, just normalize whitespace without parsing through DOM
+  // to preserve custom elements like <mock:shadow-root>
+  let expectedHtml = normalizeHtml(expected.trim());
+  receivedHtml = normalizeHtml(receivedHtml);
+
+  // Debug logging
+  if (expectedHtml !== receivedHtml) {
+    console.log('Expected (normalized):', JSON.stringify(expectedHtml));
+    console.log('Received (normalized):', JSON.stringify(receivedHtml));
+  }
 
   const pass = receivedHtml === expectedHtml;
 
@@ -377,9 +399,7 @@ export function toEqualHtml(
         ? `Expected HTML not to equal:\n${prettifyHtml(expectedHtml)}`
         : `Expected HTML to equal:\n${prettifyHtml(expectedHtml)}\n\nReceived:\n${prettifyHtml(receivedHtml)}`,
   };
-}
-
-/**
+}/**
  * Custom matcher to check if an element's Light DOM matches the expected HTML
  * Does not serialize shadow DOM
  */
@@ -416,12 +436,16 @@ export function toEqualLightHtml(
     );
   }
 
-  // Parse and serialize expected HTML for consistent formatting
-  const expectedFragment = parseHtmlFragment(expected);
-  let expectedHtml = (expectedFragment as any).innerHTML || expectedFragment.textContent || '';
-  // Normalize whitespace for comparison - collapse multiple spaces/newlines
-  expectedHtml = expectedHtml.replace(/\s+/g, ' ').replace(/>\s+</g, '><').trim();
-  receivedHtml = receivedHtml.replace(/\s+/g, ' ').replace(/>\s+</g, '><').trim();
+  // For expected HTML, just normalize whitespace without parsing through DOM  
+  // to preserve custom elements like <mock:shadow-root>
+  let expectedHtml = normalizeHtml(expected.trim());
+  receivedHtml = normalizeHtml(receivedHtml);
+
+  // Debug logging
+  if (expectedHtml !== receivedHtml) {
+    console.log('LightDOM Expected (normalized):', JSON.stringify(expectedHtml));
+    console.log('LightDOM Received (normalized):', JSON.stringify(receivedHtml));
+  }
 
   const pass = receivedHtml === expectedHtml;
 
@@ -435,18 +459,191 @@ export function toEqualLightHtml(
 }
 
 /**
+ * Check if an EventSpy has received at least one event
+ */
+export function toHaveReceivedEvent(
+  received: EventSpy
+): { pass: boolean; message: () => string } {
+  const pass = received.length > 0;
+  
+  return {
+    pass,
+    message: () =>
+      pass
+        ? `Expected event "${received.eventName}" not to have been received`
+        : `Expected event "${received.eventName}" to have been received, but it was not`,
+  };
+}
+
+/**
+ * Check if an EventSpy has received an event a specific number of times
+ */
+export function toHaveReceivedEventTimes(
+  received: EventSpy,
+  count: number
+): { pass: boolean; message: () => string } {
+  const pass = received.length === count;
+  
+  return {
+    pass,
+    message: () =>
+      pass
+        ? `Expected event "${received.eventName}" not to have been received ${count} times`
+        : `Expected event "${received.eventName}" to have been received ${count} times, but it was received ${received.length} times`,
+  };
+}
+
+/**
+ * Safely stringify a value, handling circular references
+ */
+function safeStringify(value: any): string {
+  try {
+    return JSON.stringify(value);
+  } catch (error) {
+    // If circular reference, just return a string representation
+    return String(value);
+  }
+}
+
+/**
+ * Safely compare two values, handling circular references
+ */
+function safeEquals(a: any, b: any): boolean {
+  // Try JSON comparison first
+  try {
+    return JSON.stringify(a) === JSON.stringify(b);
+  } catch (error) {
+    // If circular reference, fall back to shallow comparison
+    if (typeof a === 'object' && typeof b === 'object' && a !== null && b !== null) {
+      const keysA = Object.keys(a);
+      const keysB = Object.keys(b);
+      if (keysA.length !== keysB.length) return false;
+      return keysA.every(key => a[key] === b[key]);
+    }
+    return a === b;
+  }
+}
+
+/**
+ * Check if the last received event has the expected detail
+ */
+export function toHaveReceivedEventDetail(
+  received: EventSpy,
+  detail: any
+): { pass: boolean; message: () => string } {
+  if (received.length === 0) {
+    return {
+      pass: false,
+      message: () => `Expected event "${received.eventName}" to have been received with detail, but no events were received`,
+    };
+  }
+  
+  const lastEvent = received.lastEvent!;
+  const pass = safeEquals(lastEvent.detail, detail);
+  
+  return {
+    pass,
+    message: () =>
+      pass
+        ? `Expected last event detail not to equal ${safeStringify(detail)}`
+        : `Expected last event detail to equal ${safeStringify(detail)}, but got ${safeStringify(lastEvent.detail)}`,
+  };
+}
+
+/**
+ * Check if the first received event has the expected detail
+ */
+export function toHaveFirstReceivedEventDetail(
+  received: EventSpy,
+  detail: any
+): { pass: boolean; message: () => string } {
+  if (received.length === 0) {
+    return {
+      pass: false,
+      message: () => `Expected event "${received.eventName}" to have been received with detail, but no events were received`,
+    };
+  }
+  
+  const firstEvent = received.firstEvent!;
+  const pass = safeEquals(firstEvent.detail, detail);
+  
+  return {
+    pass,
+    message: () =>
+      pass
+        ? `Expected first event detail not to equal ${safeStringify(detail)}`
+        : `Expected first event detail to equal ${safeStringify(detail)}, but got ${safeStringify(firstEvent.detail)}`,
+  };
+}
+
+/**
+ * Check if the last received event has the expected detail (alias for toHaveReceivedEventDetail)
+ */
+export function toHaveLastReceivedEventDetail(
+  received: EventSpy,
+  detail: any
+): { pass: boolean; message: () => string } {
+  return toHaveReceivedEventDetail(received, detail);
+}
+
+/**
+ * Check if the event at a specific index has the expected detail
+ */
+export function toHaveNthReceivedEventDetail(
+  received: EventSpy,
+  index: number,
+  detail: any
+): { pass: boolean; message: () => string } {
+  if (received.length === 0) {
+    return {
+      pass: false,
+      message: () => `Expected event "${received.eventName}" to have been received with detail, but no events were received`,
+    };
+  }
+  
+  if (index < 0 || index >= received.length) {
+    return {
+      pass: false,
+      message: () => `Expected event at index ${index}, but only ${received.length} events were received`,
+    };
+  }
+  
+  const event = received.events[index];
+  const pass = safeEquals(event.detail, detail);
+  
+  return {
+    pass,
+    message: () =>
+      pass
+        ? `Expected event at index ${index} detail not to equal ${safeStringify(detail)}`
+        : `Expected event at index ${index} detail to equal ${safeStringify(detail)}, but got ${safeStringify(event.detail)}`,
+  };
+}
+
+/**
  * Install custom matchers
  */
 export function installMatchers() {
   expect.extend({
     toHaveClass,
+    toHaveClasses,
+    toMatchClasses,
     toHaveAttribute,
+    toEqualAttribute,
+    toEqualAttributes,
     toHaveProperty,
     toHaveTextContent,
+    toEqualText,
     toBeVisible,
     toHaveShadowRoot,
     toEqualHtml,
     toEqualLightHtml,
+    toHaveReceivedEvent,
+    toHaveReceivedEventTimes,
+    toHaveReceivedEventDetail,
+    toHaveFirstReceivedEventDetail,
+    toHaveLastReceivedEventDetail,
+    toHaveNthReceivedEventDetail,
   });
 }
 

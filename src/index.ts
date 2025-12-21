@@ -14,6 +14,9 @@ export {
   toEqualLightHtml,
 } from './testing/matchers.js';
 
+// Snapshot serializer
+export { StencilSnapshotSerializer } from './testing/snapshot-serializer.js';
+
 // Type exports
 export type {
   RenderOptions,
