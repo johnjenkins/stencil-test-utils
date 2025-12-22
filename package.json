@@ -54,7 +54,7 @@
   "packageManager": "pnpm@10.26.0",
   "peerDependencies": {
     "@stencil/core": "^4.0.0",
-    "vitest": "^2.0.0 || ^3.0.0"
+    "vitest": "^4.0.0 || ^3.0.0 || ^2.0.0"
   },
   "peerDependenciesMeta": {
     "@playwright/test": {
@@ -67,6 +67,12 @@
       "optional": true
     },
     "happy-dom": {
+      "optional": true
+    },
+    "@vitest/browser-webdriverio": {
+      "optional": true
+    },
+    "@vitest/browser-playwright": {
       "optional": true
     }
   },
@@ -83,7 +89,7 @@
     "prettier": "^3.7.4",
     "semver": "^7.7.3",
     "typescript": "~5.8.3",
-    "vitest": "^3.0.0"
+    "vitest": "^4.0.0"
   },
   "dependencies": {
     "jiti": "^2.6.1",

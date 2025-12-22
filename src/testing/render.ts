@@ -1,12 +1,34 @@
 import { render as stencilRender } from '@stencil/core';
 import type { RenderResult, EventSpy } from '../types.js';
 
+interface RenderOptions {
+  clearStage?: boolean;
+  stageAttrs?: Record<string, string>;
+}
+
+// Track event spies
+const eventSpies = new WeakMap<HTMLElement, EventSpy[]>();
+
 /**
  * Render using Stencil's render
  */
-export async function render<T extends HTMLElement = HTMLElement>(vnode: any): Promise<RenderResult<T>> {
+export async function render<T extends HTMLElement = HTMLElement>(
+  vnode: any, 
+  options: RenderOptions = {
+    clearStage: true,
+    stageAttrs: { class: 'stencil-component-stage' },
+  }
+): Promise<RenderResult<T>> {
   // Use Stencil's render which handles VNodes properly in the browser
   const container = document.createElement('div');
+  Object.entries(options.stageAttrs || {}).forEach(([key, value]) => {
+    container.setAttribute(key, value);
+  });
+  if (options.clearStage) {
+    // Clear existing stage containers
+    const existingStages = document.querySelectorAll('div');
+    existingStages.forEach(stage => stage.remove());
+  }
   document.body.appendChild(container);
 
   await stencilRender(vnode, container);
@@ -22,9 +44,6 @@ export async function render<T extends HTMLElement = HTMLElement>(vnode: any): P
   if (typeof (element as any).componentOnReady === 'function') {
     await (element as any).componentOnReady();
   }
-
-  // Track event spies
-  const eventSpies = new Map<string, EventSpy>();
 
   function waitForChanges(documentElement = document.documentElement) {
     return new Promise<void>((resolve) => {
@@ -75,18 +94,12 @@ export async function render<T extends HTMLElement = HTMLElement>(vnode: any): P
     if (container.parentElement) {
       container.parentElement.removeChild(container);
     }
-
-    // Clean up event listeners
-    eventSpies.forEach((spy) => {
-      element.removeEventListener(spy.eventName, (spy as any)._listener);
-    });
-    eventSpies.clear();
   };
 
   const spyOnEvent = (eventName: string): EventSpy => {
     // Return existing spy if already created
-    if (eventSpies.has(eventName)) {
-      return eventSpies.get(eventName)!;
+    if (eventSpies.has(container)) {
+      return eventSpies.get(container)!.find(spy => spy.eventName === eventName)!;
     }
 
     const spy: EventSpy = {
@@ -110,8 +123,13 @@ export async function render<T extends HTMLElement = HTMLElement>(vnode: any): P
 
     (spy as any)._listener = listener;
     element.addEventListener(eventName, listener);
-    eventSpies.set(eventName, spy);
-
+    // Store the spy
+    let spiesForElement = eventSpies.get(container);
+    if (!spiesForElement) {
+      spiesForElement = [];
+      eventSpies.set(container, spiesForElement);
+    }
+    spiesForElement.push(spy);
     return spy;
   };
 

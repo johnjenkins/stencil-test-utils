@@ -13,7 +13,8 @@
     "skipLibCheck": true,
     "jsx": "react",
     "jsxFactory": "h",
-    "jsxFragmentFactory": "Fragment"
+    "jsxFragmentFactory": "Fragment",
+    "types": ["vitest/globals", "@vitest/browser/matchers"]
   },
   "include": ["src"],
   "exclude": ["node_modules"]

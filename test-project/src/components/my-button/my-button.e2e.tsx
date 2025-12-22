@@ -3,9 +3,8 @@
  * These tests run in a real browser using Playwright
  */
 import { describe, it, expect } from 'vitest';
-import { render } from '@stencil/test-utils';
-import { h } from '@stencil/core';
-import { page, userEvent } from '@vitest/browser/context';
+import { render, h } from '@stencil/test-utils';
+import { userEvent } from 'vitest/browser';
 
 describe('my-button - browser tests', () => {
   describe('rendering in real browser', () => {
@@ -45,19 +44,17 @@ describe('my-button - browser tests', () => {
 
   describe('visual regression', () => {
     it('should match screenshot for default variant', async () => {
-      await render(<my-button>Default Button</my-button>);
-
-      expect(await page.screenshot()).toMatchSnapshot('button-default.png');
+      const { root } = await render(<my-button>Default Button</my-button>);
+      await expect(root).toMatchScreenshot('default' as any);
     });
 
     it('should match screenshot for primary variant', async () => {
-      await render(<my-button variant="primary">Primary Button</my-button>);
-
-      expect(await page.screenshot()).toMatchSnapshot('button-primary.png');
+       const { root } = await render(<my-button variant="primary">Primary Button</my-button>);
+      await expect(root).toMatchScreenshot('primary' as any);
     });
 
     it('should match screenshot for all variants', async () => {
-      await render(
+      const { root } = await render(
         <div
           style={{ display: 'flex', gap: '1rem', padding: '1rem', flexDirection: 'column', alignItems: 'flex-start' }}
         >
@@ -67,7 +64,7 @@ describe('my-button - browser tests', () => {
         </div>,
       );
 
-      expect(await page.screenshot()).toMatchSnapshot('button-all-variants.png');
+      await expect(root).toMatchScreenshot('all-variants' as any);
     });
   });
 

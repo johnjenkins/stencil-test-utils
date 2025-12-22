@@ -88,8 +88,7 @@ export {};
 
 ```typescript
 import { describe, it, expect } from 'vitest';
-import { h } from '@stencil/core';
-import { render } from '@stencil/test-utils';
+import { render, h } from '@stencil/test-utils';
 
 describe('my-button', () => {
   it('renders with text', async () => {
@@ -115,6 +114,7 @@ describe('my-button', () => {
 Render a component for testing.
 
 ```tsx
+import { render, h } from '@stencil/test-utils';
 const { root, waitForChanges } = await render(<my-component name="World" />);
 
 // Access the element
@@ -177,6 +177,8 @@ expect(clickSpy.lastEvent?.detail).toEqual({ buttonId: 'my-button' });
 The package includes a custom snapshot serializer for Stencil components that properly handles shadow DOM:
 
 ```typescript
+import { render, h } from '@stencil/test-utils';
+...
 const { root } = await render(<my-component />);
 expect(root).toMatchSnapshot();
 ```
@@ -193,6 +195,19 @@ expect(root).toMatchSnapshot();
   Click me
 </my-component>
 ```
+
+## Screenshot Testing
+
+Browser tests can include screenshot comparisons using Vitest's screenshot capabilities:
+
+```tsx
+import { render, h } from '@stencil/test-utils';
+...
+const { root } = await render(<my-button variant="primary">Primary Button</my-button>);
+await expect(root).toMatchScreenshot();
+```
+
+Refer to Vitest's [screenshot testing documentation](https://vitest.dev/guide/snapshot.html#visual-snapshots) for more details.
 
 ## CLI
 
