@@ -1,0 +1,27 @@
+{
+  "name": "vitest-environment-stencil",
+  "version": "0.1.0",
+  "description": "Custom Vitest environment for Stencil component testing",
+  "type": "module",
+  "main": "./index.mjs",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.mjs"
+    }
+  },
+  "files": [
+    "index.mjs",
+    "index.d.ts"
+  ],
+  "keywords": [
+    "vitest",
+    "environment",
+    "stencil",
+    "testing"
+  ],
+  "peerDependencies": {
+    "@stencil/test-utils": "workspace:*"
+  }
+}

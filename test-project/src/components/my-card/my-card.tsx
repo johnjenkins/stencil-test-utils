@@ -28,7 +28,7 @@ export class MyCard {
     return (
       <div
         class={{
-          'card': true,
+          card: true,
           [`card--elevation-${this.elevation}`]: true,
           'card--interactive': this.interactive,
         }}
@@ -39,11 +39,11 @@ export class MyCard {
             <slot name="header-actions" />
           </div>
         )}
-        
+
         <div class="card__content">
           <slot />
         </div>
-        
+
         <div class="card__footer">
           <slot name="footer" />
         </div>

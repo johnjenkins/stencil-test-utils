@@ -1,7 +1,7 @@
 /**
  * Setup file for happy-dom environment
  * Auto-loaded when using a project named 'happy-dom' or containing 'happy-dom'
- * 
+ *
  * Configures happy-dom with Stencil-specific setup
  * happy-dom generally has better built-in support than jsdom, so fewer polyfills are needed
  */
@@ -16,4 +16,3 @@ export async function setup() {
 
 // Auto-run setup
 setup();
-

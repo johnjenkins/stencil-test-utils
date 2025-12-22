@@ -1,16 +1,20 @@
 import { defineVitestConfig } from '@stencil/test-utils/config';
 
-// Unified config with projects using standard Vitest structure
 export default defineVitestConfig({
   stencilConfig: './stencil.config.ts',
   test: {
     projects: [
       {
         test: {
-          name: 'mock-doc',
+          name: 'stencil',
+          environment: 'stencil',
           include: ['**/*.spec.{ts,tsx}'],
-          exclude: ['**/*.jsdom.spec.{ts,tsx}', '**/*-jsdom.spec.{ts,tsx}', '**/*-happy.spec.{ts,tsx}', '**/*.happy.spec.{ts,tsx}'],
-          environment: 'node',
+          exclude: [
+            '**/*.jsdom.spec.{ts,tsx}',
+            '**/*-jsdom.spec.{ts,tsx}',
+            '**/*-happy.spec.{ts,tsx}',
+            '**/*.happy.spec.{ts,tsx}',
+          ],
           setupFiles: ['./vitest-setup.ts'],
         },
       },
@@ -39,13 +43,10 @@ export default defineVitestConfig({
             enabled: true,
             provider: 'playwright',
             headless: true,
-            instances: [
-              { browser: 'chromium' }
-            ],
+            instances: [{ browser: 'chromium' }],
           },
         },
       },
     ],
   },
 });
-

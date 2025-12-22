@@ -111,7 +111,7 @@ describe('my-button - new matchers', () => {
     });
 
     it('should trim whitespace before comparing', async () => {
-      const { root } = await render(<my-button>  Spaced Out  </my-button>);
+      const { root } = await render(<my-button> Spaced Out </my-button>);
 
       expect(root).toEqualText('Spaced Out');
     });
@@ -138,7 +138,7 @@ describe('my-button - new matchers', () => {
         type: 'button',
         class: 'button button--primary button--medium',
       });
-      
+
       // Check text on the root element (light DOM contains the text)
       expect(root).toEqualText('Submit');
     });

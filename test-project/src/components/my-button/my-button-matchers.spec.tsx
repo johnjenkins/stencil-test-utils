@@ -1,20 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { render, toEqualHtml, toEqualLightHtml } from '@stencil/test-utils';
+import { render } from '@stencil/test-utils';
 import { h } from '@stencil/core';
-
-// Extend expect with our custom matchers
-// This MUST be done at module level after expect is imported
-expect.extend({
-  toEqualHtml,
-  toEqualLightHtml,
-});
 
 describe('my-button - custom matchers', () => {
   describe('toEqualHtml', () => {
     it('should match complete HTML including shadow DOM', async () => {
-      const { root, waitForChanges } = await render(
-        <my-button variant="primary">Click me</my-button>
-      );
+      const { root, waitForChanges } = await render(<my-button variant="primary">Click me</my-button>);
 
       await waitForChanges();
 
@@ -32,7 +23,9 @@ describe('my-button - custom matchers', () => {
 
     it('should match HTML with different variants', async () => {
       const { root, waitForChanges } = await render(
-        <my-button variant="secondary" size="small">Small</my-button>
+        <my-button variant="secondary" size="small">
+          Small
+        </my-button>,
       );
 
       await waitForChanges();
@@ -50,9 +43,7 @@ describe('my-button - custom matchers', () => {
     });
 
     it('should match disabled button', async () => {
-      const { root, waitForChanges } = await render(
-        <my-button disabled>Disabled</my-button>
-      );
+      const { root, waitForChanges } = await render(<my-button disabled>Disabled</my-button>);
 
       await waitForChanges();
 
@@ -69,9 +60,7 @@ describe('my-button - custom matchers', () => {
     });
 
     it('should fail when HTML does not match', async () => {
-      const { root, waitForChanges } = await render(
-        <my-button>Test</my-button>
-      );
+      const { root, waitForChanges } = await render(<my-button>Test</my-button>);
 
       await waitForChanges();
 
@@ -91,9 +80,7 @@ describe('my-button - custom matchers', () => {
 
   describe('toEqualLightHtml', () => {
     it('should match light DOM only (no shadow DOM)', async () => {
-      const { root, waitForChanges } = await render(
-        <my-button variant="primary">Click me</my-button>
-      );
+      const { root, waitForChanges } = await render(<my-button variant="primary">Click me</my-button>);
 
       await waitForChanges();
 
@@ -106,7 +93,9 @@ describe('my-button - custom matchers', () => {
 
     it('should match light DOM with slot content', async () => {
       const { root, waitForChanges } = await render(
-        <my-button><span>Slotted content</span></my-button>
+        <my-button>
+          <span>Slotted content</span>
+        </my-button>,
       );
 
       await waitForChanges();
@@ -121,9 +110,7 @@ describe('my-button - custom matchers', () => {
     });
 
     it('should not include shadow DOM in comparison', async () => {
-      const { root, waitForChanges } = await render(
-        <my-button>Test</my-button>
-      );
+      const { root, waitForChanges } = await render(<my-button>Test</my-button>);
 
       await waitForChanges();
 
@@ -136,9 +123,7 @@ describe('my-button - custom matchers', () => {
     });
 
     it('should fail when light DOM does not match', async () => {
-      const { root, waitForChanges } = await render(
-        <my-button variant="primary">Test</my-button>
-      );
+      const { root, waitForChanges } = await render(<my-button variant="primary">Test</my-button>);
 
       await waitForChanges();
 
@@ -156,8 +141,10 @@ describe('my-button - custom matchers', () => {
       const { root, waitForChanges } = await render(
         <my-card cardTitle="Test Card">
           <p>Card content</p>
-          <my-button slot="footer" variant="primary">Action</my-button>
-        </my-card>
+          <my-button slot="footer" variant="primary">
+            Action
+          </my-button>
+        </my-card>,
       );
 
       await waitForChanges();

@@ -1,20 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { render, toEqualHtml, toEqualLightHtml } from '@stencil/test-utils';
+import { render } from '@stencil/test-utils';
 import { h } from '@stencil/core';
-
-// Extend expect with our custom matchers  
-expect.extend({
-  toEqualHtml,
-  toEqualLightHtml,
-});
 
 // Test file watching
 describe('my-button - custom matchers (happy-dom)', () => {
   describe('toEqualHtml', () => {
     it('should match complete HTML including shadow DOM in happy-dom', async () => {
-      const { root, waitForChanges } = await render(
-        <my-button variant="primary">Click me</my-button>
-      );
+      const { root, waitForChanges } = await render(<my-button variant="primary">Click me</my-button>);
 
       await waitForChanges();
 
@@ -32,7 +24,9 @@ describe('my-button - custom matchers (happy-dom)', () => {
 
     it('should match HTML with different variants in happy-dom', async () => {
       const { root, waitForChanges } = await render(
-        <my-button variant="secondary" size="small">Small</my-button>
+        <my-button variant="secondary" size="small">
+          Small
+        </my-button>,
       );
 
       await waitForChanges();
@@ -52,9 +46,7 @@ describe('my-button - custom matchers (happy-dom)', () => {
 
   describe('toEqualLightHtml', () => {
     it('should match light DOM only in happy-dom', async () => {
-      const { root, waitForChanges } = await render(
-        <my-button variant="primary">Click me</my-button>
-      );
+      const { root, waitForChanges } = await render(<my-button variant="primary">Click me</my-button>);
 
       await waitForChanges();
 
@@ -68,7 +60,9 @@ describe('my-button - custom matchers (happy-dom)', () => {
 
     it('should match light DOM with slot content in happy-dom', async () => {
       const { root, waitForChanges } = await render(
-        <my-button><span>Slotted content</span></my-button>
+        <my-button>
+          <span>Slotted content</span>
+        </my-button>,
       );
 
       await waitForChanges();

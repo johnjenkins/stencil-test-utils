@@ -1,6 +1,6 @@
 /**
  * Custom matchers for Stencil component testing
- * 
+ *
  * These extend Vitest's expect with Stencil-specific assertions
  */
 
@@ -45,18 +45,13 @@ declare global {
 /**
  * Check if element has a class
  */
-export function toHaveClass(
-  received: HTMLElement,
-  className: string
-): { pass: boolean; message: () => string } {
+export function toHaveClass(received: HTMLElement, className: string): { pass: boolean; message: () => string } {
   const pass = received.classList.contains(className);
-  
+
   return {
     pass,
     message: () =>
-      pass
-        ? `Expected element not to have class "${className}"`
-        : `Expected element to have class "${className}"`,
+      pass ? `Expected element not to have class "${className}"` : `Expected element to have class "${className}"`,
   };
 }
 
@@ -64,21 +59,18 @@ export function toHaveClass(
  * Check if element has multiple classes
  * Checks if element has all of the specified CSS classes (order doesn't matter)
  */
-export function toHaveClasses(
-  received: HTMLElement,
-  classNames: string[]
-): { pass: boolean; message: () => string } {
+export function toHaveClasses(received: HTMLElement, classNames: string[]): { pass: boolean; message: () => string } {
   const missingClasses: string[] = [];
-  
+
   for (const className of classNames) {
     if (!received.classList.contains(className)) {
       missingClasses.push(className);
     }
   }
-  
+
   const pass = missingClasses.length === 0;
   const actualClasses = Array.from(received.classList).join(', ');
-  
+
   return {
     pass,
     message: () =>
@@ -92,19 +84,15 @@ export function toHaveClasses(
  * Check if element has exactly the specified CSS classes (no more, no less)
  * Order doesn't matter, but the element must have exactly these classes
  */
-export function toMatchClasses(
-  received: HTMLElement,
-  classNames: string[]
-): { pass: boolean; message: () => string } {
+export function toMatchClasses(received: HTMLElement, classNames: string[]): { pass: boolean; message: () => string } {
   // Get classes from the class attribute to support mock-doc
   const classAttr = received.getAttribute('class') || '';
   const actualClasses = classAttr.split(/\s+/).filter(Boolean).sort();
   const expectedClasses = [...classNames].filter(Boolean).sort();
-  
-  const pass = 
-    actualClasses.length === expectedClasses.length &&
-    actualClasses.every((cls, idx) => cls === expectedClasses[idx]);
-  
+
+  const pass =
+    actualClasses.length === expectedClasses.length && actualClasses.every((cls, idx) => cls === expectedClasses[idx]);
+
   return {
     pass,
     message: () =>
@@ -120,21 +108,21 @@ export function toMatchClasses(
 export function toHaveAttribute(
   received: HTMLElement,
   attribute: string,
-  value?: string
+  value?: string,
 ): { pass: boolean; message: () => string } {
   const hasAttribute = received.hasAttribute(attribute);
-  
+
   if (!hasAttribute) {
     return {
       pass: false,
       message: () => `Expected element to have attribute "${attribute}"`,
     };
   }
-  
+
   if (value !== undefined) {
     const actualValue = received.getAttribute(attribute);
     const pass = actualValue === value;
-    
+
     return {
       pass,
       message: () =>
@@ -143,7 +131,7 @@ export function toHaveAttribute(
           : `Expected element to have attribute "${attribute}" with value "${value}", but got "${actualValue}"`,
     };
   }
-  
+
   return {
     pass: true,
     message: () => `Expected element not to have attribute "${attribute}"`,
@@ -156,11 +144,11 @@ export function toHaveAttribute(
 export function toEqualAttribute(
   received: HTMLElement,
   attribute: string,
-  value: string
+  value: string,
 ): { pass: boolean; message: () => string } {
   const actualValue = received.getAttribute(attribute);
   const pass = actualValue === value;
-  
+
   return {
     pass,
     message: () =>
@@ -175,30 +163,30 @@ export function toEqualAttribute(
  */
 export function toEqualAttributes(
   received: HTMLElement,
-  expectedAttrs: Record<string, string>
+  expectedAttrs: Record<string, string>,
 ): { pass: boolean; message: () => string } {
   const mismatches: string[] = [];
   const actualAttrs: Record<string, string | null> = {};
-  
+
   // Collect all actual attributes
   for (let i = 0; i < received.attributes.length; i++) {
     const attr = received.attributes[i];
     actualAttrs[attr.name] = attr.value;
   }
-  
+
   // Check expected attributes
   for (const [name, expectedValue] of Object.entries(expectedAttrs)) {
     const actualValue = received.getAttribute(name);
-    
+
     if (actualValue === null) {
       mismatches.push(`missing "${name}"`);
     } else if (actualValue !== expectedValue) {
       mismatches.push(`"${name}": expected "${expectedValue}", got "${actualValue}"`);
     }
   }
-  
+
   const pass = mismatches.length === 0;
-  
+
   return {
     pass,
     message: () =>
@@ -211,24 +199,20 @@ export function toEqualAttributes(
 /**
  * Check if element has a property
  */
-export function toHaveProperty(
-  received: any,
-  property: string,
-  value?: any
-): { pass: boolean; message: () => string } {
+export function toHaveProperty(received: any, property: string, value?: any): { pass: boolean; message: () => string } {
   const hasProperty = property in received;
-  
+
   if (!hasProperty) {
     return {
       pass: false,
       message: () => `Expected element to have property "${property}"`,
     };
   }
-  
+
   if (value !== undefined) {
     const actualValue = received[property];
     const pass = actualValue === value;
-    
+
     return {
       pass,
       message: () =>
@@ -237,7 +221,7 @@ export function toHaveProperty(
           : `Expected element to have property "${property}" with value ${JSON.stringify(value)}, but got ${JSON.stringify(actualValue)}`,
     };
   }
-  
+
   return {
     pass: true,
     message: () => `Expected element not to have property "${property}"`,
@@ -247,13 +231,10 @@ export function toHaveProperty(
 /**
  * Check if element has text content
  */
-export function toHaveTextContent(
-  received: HTMLElement,
-  text: string
-): { pass: boolean; message: () => string } {
+export function toHaveTextContent(received: HTMLElement, text: string): { pass: boolean; message: () => string } {
   const actualText = received.textContent || '';
   const pass = actualText.includes(text);
-  
+
   return {
     pass,
     message: () =>
@@ -266,14 +247,11 @@ export function toHaveTextContent(
 /**
  * Check if element's text content exactly matches (after trimming)
  */
-export function toEqualText(
-  received: HTMLElement,
-  expectedText: string
-): { pass: boolean; message: () => string } {
+export function toEqualText(received: HTMLElement, expectedText: string): { pass: boolean; message: () => string } {
   const actualText = (received.textContent || '').trim();
   const trimmedExpected = expectedText.trim();
   const pass = actualText === trimmedExpected;
-  
+
   return {
     pass,
     message: () =>
@@ -286,38 +264,25 @@ export function toEqualText(
 /**
  * Check if element is visible
  */
-export function toBeVisible(
-  received: HTMLElement
-): { pass: boolean; message: () => string } {
+export function toBeVisible(received: HTMLElement): { pass: boolean; message: () => string } {
   const style = window.getComputedStyle(received);
-  const pass =
-    style.display !== 'none' &&
-    style.visibility !== 'hidden' &&
-    style.opacity !== '0';
-  
+  const pass = style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+
   return {
     pass,
-    message: () =>
-      pass
-        ? `Expected element not to be visible`
-        : `Expected element to be visible`,
+    message: () => (pass ? `Expected element not to be visible` : `Expected element to be visible`),
   };
 }
 
 /**
  * Check if element has shadow root
  */
-export function toHaveShadowRoot(
-  received: HTMLElement
-): { pass: boolean; message: () => string } {
+export function toHaveShadowRoot(received: HTMLElement): { pass: boolean; message: () => string } {
   const pass = !!received.shadowRoot;
-  
+
   return {
     pass,
-    message: () =>
-      pass
-        ? `Expected element not to have shadow root`
-        : `Expected element to have shadow root`,
+    message: () => (pass ? `Expected element not to have shadow root` : `Expected element to have shadow root`),
   };
 }
 
@@ -347,16 +312,14 @@ function parseHtmlFragment(html: string): DocumentFragment {
  */
 export function toEqualHtml(
   received: string | HTMLElement | ShadowRoot,
-  expected: string
+  expected: string,
 ): { pass: boolean; message: () => string } {
   if (received == null) {
     throw new Error(`expect.toEqualHtml() received value is "${received}"`);
   }
 
   if (typeof (received as any).then === 'function') {
-    throw new TypeError(
-      `Element must be a resolved value, not a promise, before it can be tested`
-    );
+    throw new TypeError(`Element must be a resolved value, not a promise, before it can be tested`);
   }
 
   let receivedHtml: string;
@@ -365,7 +328,7 @@ export function toEqualHtml(
   if (typeof received === 'string') {
     const fragment = parseHtmlFragment(received);
     // For string inputs, use innerHTML to avoid template wrapper
-    receivedHtml = ((fragment as any).innerHTML || fragment.textContent || '');
+    receivedHtml = (fragment as any).innerHTML || fragment.textContent || '';
   } else if ((received as any).nodeType === 11) {
     // Document fragment
     receivedHtml = serializeHtml(received as any, { serializeShadowRoot: true });
@@ -373,9 +336,7 @@ export function toEqualHtml(
     // Element node
     receivedHtml = serializeHtml(received as HTMLElement, { serializeShadowRoot: true });
   } else {
-    throw new TypeError(
-      `expect.toEqualHtml() value should be an element, shadow root, or string`
-    );
+    throw new TypeError(`expect.toEqualHtml() value should be an element, shadow root, or string`);
   }
 
   // Parse and serialize expected HTML for consistent formatting
@@ -399,22 +360,20 @@ export function toEqualHtml(
         ? `Expected HTML not to equal:\n${prettifyHtml(expectedHtml)}`
         : `Expected HTML to equal:\n${prettifyHtml(expectedHtml)}\n\nReceived:\n${prettifyHtml(receivedHtml)}`,
   };
-}/**
+} /**
  * Custom matcher to check if an element's Light DOM matches the expected HTML
  * Does not serialize shadow DOM
  */
 export function toEqualLightHtml(
   received: string | HTMLElement | ShadowRoot,
-  expected: string
+  expected: string,
 ): { pass: boolean; message: () => string } {
   if (received == null) {
     throw new Error(`expect.toEqualLightHtml() received value is "${received}"`);
   }
 
   if (typeof (received as any).then === 'function') {
-    throw new TypeError(
-      `Element must be a resolved value, not a promise, before it can be tested`
-    );
+    throw new TypeError(`Element must be a resolved value, not a promise, before it can be tested`);
   }
 
   let receivedHtml: string;
@@ -423,7 +382,7 @@ export function toEqualLightHtml(
   if (typeof received === 'string') {
     const fragment = parseHtmlFragment(received);
     // For string inputs, use innerHTML to avoid template wrapper
-    receivedHtml = ((fragment as any).innerHTML || fragment.textContent || '');
+    receivedHtml = (fragment as any).innerHTML || fragment.textContent || '';
   } else if ((received as any).nodeType === 11) {
     // Document fragment
     receivedHtml = serializeHtml(received as any, { serializeShadowRoot: false });
@@ -431,12 +390,10 @@ export function toEqualLightHtml(
     // Element node
     receivedHtml = serializeHtml(received as HTMLElement, { serializeShadowRoot: false });
   } else {
-    throw new TypeError(
-      `expect.toEqualLightHtml() value should be an element, shadow root, or string`
-    );
+    throw new TypeError(`expect.toEqualLightHtml() value should be an element, shadow root, or string`);
   }
 
-  // For expected HTML, just normalize whitespace without parsing through DOM  
+  // For expected HTML, just normalize whitespace without parsing through DOM
   // to preserve custom elements like <mock:shadow-root>
   let expectedHtml = normalizeHtml(expected.trim());
   receivedHtml = normalizeHtml(receivedHtml);
@@ -461,11 +418,9 @@ export function toEqualLightHtml(
 /**
  * Check if an EventSpy has received at least one event
  */
-export function toHaveReceivedEvent(
-  received: EventSpy
-): { pass: boolean; message: () => string } {
+export function toHaveReceivedEvent(received: EventSpy): { pass: boolean; message: () => string } {
   const pass = received.length > 0;
-  
+
   return {
     pass,
     message: () =>
@@ -478,12 +433,9 @@ export function toHaveReceivedEvent(
 /**
  * Check if an EventSpy has received an event a specific number of times
  */
-export function toHaveReceivedEventTimes(
-  received: EventSpy,
-  count: number
-): { pass: boolean; message: () => string } {
+export function toHaveReceivedEventTimes(received: EventSpy, count: number): { pass: boolean; message: () => string } {
   const pass = received.length === count;
-  
+
   return {
     pass,
     message: () =>
@@ -499,7 +451,7 @@ export function toHaveReceivedEventTimes(
 function safeStringify(value: any): string {
   try {
     return JSON.stringify(value);
-  } catch (error) {
+  } catch {
     // If circular reference, just return a string representation
     return String(value);
   }
@@ -512,13 +464,13 @@ function safeEquals(a: any, b: any): boolean {
   // Try JSON comparison first
   try {
     return JSON.stringify(a) === JSON.stringify(b);
-  } catch (error) {
+  } catch {
     // If circular reference, fall back to shallow comparison
     if (typeof a === 'object' && typeof b === 'object' && a !== null && b !== null) {
       const keysA = Object.keys(a);
       const keysB = Object.keys(b);
       if (keysA.length !== keysB.length) return false;
-      return keysA.every(key => a[key] === b[key]);
+      return keysA.every((key) => a[key] === b[key]);
     }
     return a === b;
   }
@@ -527,20 +479,18 @@ function safeEquals(a: any, b: any): boolean {
 /**
  * Check if the last received event has the expected detail
  */
-export function toHaveReceivedEventDetail(
-  received: EventSpy,
-  detail: any
-): { pass: boolean; message: () => string } {
+export function toHaveReceivedEventDetail(received: EventSpy, detail: any): { pass: boolean; message: () => string } {
   if (received.length === 0) {
     return {
       pass: false,
-      message: () => `Expected event "${received.eventName}" to have been received with detail, but no events were received`,
+      message: () =>
+        `Expected event "${received.eventName}" to have been received with detail, but no events were received`,
     };
   }
-  
+
   const lastEvent = received.lastEvent!;
   const pass = safeEquals(lastEvent.detail, detail);
-  
+
   return {
     pass,
     message: () =>
@@ -555,18 +505,19 @@ export function toHaveReceivedEventDetail(
  */
 export function toHaveFirstReceivedEventDetail(
   received: EventSpy,
-  detail: any
+  detail: any,
 ): { pass: boolean; message: () => string } {
   if (received.length === 0) {
     return {
       pass: false,
-      message: () => `Expected event "${received.eventName}" to have been received with detail, but no events were received`,
+      message: () =>
+        `Expected event "${received.eventName}" to have been received with detail, but no events were received`,
     };
   }
-  
+
   const firstEvent = received.firstEvent!;
   const pass = safeEquals(firstEvent.detail, detail);
-  
+
   return {
     pass,
     message: () =>
@@ -581,7 +532,7 @@ export function toHaveFirstReceivedEventDetail(
  */
 export function toHaveLastReceivedEventDetail(
   received: EventSpy,
-  detail: any
+  detail: any,
 ): { pass: boolean; message: () => string } {
   return toHaveReceivedEventDetail(received, detail);
 }
@@ -592,25 +543,26 @@ export function toHaveLastReceivedEventDetail(
 export function toHaveNthReceivedEventDetail(
   received: EventSpy,
   index: number,
-  detail: any
+  detail: any,
 ): { pass: boolean; message: () => string } {
   if (received.length === 0) {
     return {
       pass: false,
-      message: () => `Expected event "${received.eventName}" to have been received with detail, but no events were received`,
+      message: () =>
+        `Expected event "${received.eventName}" to have been received with detail, but no events were received`,
     };
   }
-  
+
   if (index < 0 || index >= received.length) {
     return {
       pass: false,
       message: () => `Expected event at index ${index}, but only ${received.length} events were received`,
     };
   }
-  
+
   const event = received.events[index];
   const pass = safeEquals(event.detail, detail);
-  
+
   return {
     pass,
     message: () =>

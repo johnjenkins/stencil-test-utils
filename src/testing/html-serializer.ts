@@ -19,7 +19,7 @@ export interface SerializeOptions {
  */
 export function serializeHtml(
   input: HTMLElement | ShadowRoot | DocumentFragment | string,
-  options: SerializeOptions = {}
+  options: SerializeOptions = {},
 ): string {
   const { serializeShadowRoot = true, pretty = true, excludeStyles = true } = options;
 
@@ -40,7 +40,7 @@ export function serializeHtml(
 function serializeElementWithShadow(
   element: HTMLElement | DocumentFragment,
   excludeStyles: boolean,
-  serializeShadowRoot: boolean = true
+  serializeShadowRoot: boolean = true,
 ): string {
   // Handle DocumentFragment
   if ((element as any).nodeType === 11) {
@@ -61,10 +61,10 @@ function serializeElementWithShadow(
 
   const elem = element as HTMLElement;
   const tagName = elem.tagName.toLowerCase();
-  
+
   // Build opening tag with attributes
   let html = `<${tagName}`;
-  
+
   // Add attributes
   if (elem.attributes) {
     for (let i = 0; i < elem.attributes.length; i++) {
@@ -72,14 +72,14 @@ function serializeElementWithShadow(
       html += ` ${attr.name}="${attr.value}"`;
     }
   }
-  
+
   html += '>';
-  
+
   // Add shadow DOM if present and requested
   if (serializeShadowRoot && 'shadowRoot' in elem && elem.shadowRoot) {
     // Use mock:shadow-root format to match mock-doc's output
     html += '<mock:shadow-root>';
-    
+
     // Serialize shadow DOM children
     const shadowChildren = Array.from(elem.shadowRoot.childNodes);
     for (const child of shadowChildren) {
@@ -96,10 +96,10 @@ function serializeElementWithShadow(
         if (text) html += text;
       }
     }
-    
+
     html += '</mock:shadow-root>';
   }
-  
+
   // Add light DOM children
   const children = Array.from(elem.childNodes);
   for (const child of children) {
@@ -112,9 +112,9 @@ function serializeElementWithShadow(
       if (text) html += text;
     }
   }
-  
+
   html += `</${tagName}>`;
-  
+
   return html;
 }
 
@@ -125,23 +125,23 @@ export function prettifyHtml(html: string): string {
   const indentSize = 2;
   let indentLevel = 0;
   const lines: string[] = [];
-  
+
   // Normalize whitespace
   html = html.replace(/\s+/g, ' ').replace(/>\s*</g, '><').trim();
-  
+
   // Split on tag boundaries while preserving tags
   const parts = html.split(/(<[^>]+>)/);
-  
+
   for (let i = 0; i < parts.length; i++) {
     const part = parts[i].trim();
     if (!part) continue;
-    
+
     if (part.startsWith('<')) {
       // This is a tag
       if (part.startsWith('</')) {
         // Closing tag - decrease indent first
         indentLevel = Math.max(0, indentLevel - 1);
-        
+
         // Check if we should merge with previous line (empty element)
         const tagName = part.match(/<\/([^>\s]+)/)?.[1];
         const lastLine = lines[lines.length - 1];
@@ -153,7 +153,7 @@ export function prettifyHtml(html: string): string {
             continue;
           }
         }
-        
+
         lines.push(' '.repeat(indentLevel * indentSize) + part);
       } else if (part.endsWith('/>')) {
         // Self-closing tag
@@ -169,7 +169,7 @@ export function prettifyHtml(html: string): string {
       lines.push(' '.repeat(indentLevel * indentSize) + part);
     }
   }
-  
+
   return lines.join('\n');
 }
 
@@ -177,8 +177,5 @@ export function prettifyHtml(html: string): string {
  * Normalize HTML for comparison by removing extra whitespace
  */
 export function normalizeHtml(html: string): string {
-  return html
-    .replace(/\s+/g, ' ')
-    .replace(/>\s+</g, '><')
-    .trim();
+  return html.replace(/\s+/g, ' ').replace(/>\s+</g, '><').trim();
 }

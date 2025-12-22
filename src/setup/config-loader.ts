@@ -8,7 +8,7 @@ import { resolve } from 'path';
  */
 export async function loadStencilConfig(configPath: string): Promise<StencilConfig | undefined> {
   const resolvedPath = resolve(process.cwd(), configPath);
-  
+
   if (!existsSync(resolvedPath)) {
     console.warn(`Stencil config not found at ${resolvedPath}`);
     return undefined;
@@ -21,21 +21,13 @@ export async function loadStencilConfig(configPath: string): Promise<StencilConf
       interopDefault: true,
       moduleCache: false,
     });
-    
-    const configModule = await jiti.import(resolvedPath) as any;
+
+    const configModule = (await jiti.import(resolvedPath)) as any;
     return configModule.config || configModule.default || configModule;
   } catch (error) {
     console.error(`Failed to load Stencil config from ${resolvedPath}:`, error);
     return undefined;
   }
-}
-
-/**
- * Get the output directory from Stencil config
- */
-export function getStencilOutputDir(config?: StencilConfig): string {
-  const distTarget = config?.outputTargets?.find((t: any) => t.type === 'dist');
-  return (distTarget as any)?.dir || 'dist';
 }
 
 /**
@@ -54,7 +46,7 @@ export function getStencilOutputDirs(config?: StencilConfig): string[] {
   }
 
   const outputDirs = new Set<string>();
-  
+
   config.outputTargets.forEach((target: any) => {
     // Add common output directories based on target type
     if (target.dir) {
@@ -63,7 +55,7 @@ export function getStencilOutputDirs(config?: StencilConfig): string[] {
     if (target.buildDir) {
       outputDirs.add(target.buildDir);
     }
-    
+
     // Handle Stencil default directories for output types that don't specify dir
     // Based on Stencil's default behavior:
     if (target.type === 'dist' || target.type === 'dist-custom-elements' || target.type === 'dist-hydrate-script') {
@@ -84,10 +76,10 @@ export function getStencilOutputDirs(config?: StencilConfig): string[] {
 
   // Always include common output directories
   outputDirs.add('.stencil');
-  
+
   // Filter out invalid paths (those that navigate up with ..)
-  const validDirs = Array.from(outputDirs).filter(dir => !dir.includes('..'));
-  
+  const validDirs = Array.from(outputDirs).filter((dir) => !dir.includes('..'));
+
   return validDirs.length > 0 ? validDirs : ['dist', 'www', 'build', '.stencil'];
 }
 

@@ -1,0 +1,10 @@
+node_modules/
+test-project/**/node_modules/
+dist/
+*.log
+.DS_Store
+coverage/
+.vitest/
+loader/
+www/
+hydrate/

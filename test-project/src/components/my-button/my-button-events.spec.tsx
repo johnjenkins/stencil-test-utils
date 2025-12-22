@@ -146,14 +146,14 @@ describe('my-button - event spy', () => {
       // Verify event counts
       expect(spy).toHaveReceivedEvent();
       expect(spy).toHaveReceivedEventTimes(3);
-      
+
       // Verify all events are captured
       expect(spy.events).toHaveLength(3);
       expect(spy.firstEvent).toBeDefined();
       expect(spy.lastEvent).toBeDefined();
-      
+
       // Verify all events have mouse event details
-      spy.events.forEach(event => {
+      spy.events.forEach((event) => {
         expect(event.detail).toBeDefined();
       });
     });
@@ -171,7 +171,7 @@ describe('my-button - event spy', () => {
 
       expect(clickSpy).toHaveReceivedEvent();
       expect(clickSpy).toHaveReceivedEventTimes(1);
-      
+
       // Custom event should not have been received
       expect(() => {
         expect(customSpy).toHaveReceivedEvent();

@@ -27,11 +27,5 @@ export const config: Config = {
   sourceMap: false,
   // Exclude test files and snapshots from Stencil's file watcher
   // to prevent infinite rebuild loops when running tests in watch mode
-  watchIgnoredRegex: [
-    /\.spec\.(ts|tsx|js|jsx)$/,
-    /\.test\.(ts|tsx|js|jsx)$/,
-    /\.e2e\.(ts|tsx|js|jsx)$/,
-    /__snapshots__/,
-    /__screenshots__/,
-  ],
+  // watchIgnoredRegex: [/\.(spec|test|e2e)\.(ts|tsx|js|jsx)$/, /__snapshots__/, /__screenshots__/, /vitest\.config/],
 };

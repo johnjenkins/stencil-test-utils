@@ -1,15 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { render, StencilSnapshotSerializer } from '@stencil/test-utils';
+import { render } from '@stencil/test-utils';
 import { h } from '@stencil/core';
-
-// Add our custom snapshot serializer
-expect.addSnapshotSerializer(StencilSnapshotSerializer);
 
 describe('my-button - snapshot tests (jsdom)', () => {
   it('should match snapshot for primary button', async () => {
-    const { root, waitForChanges } = await render(
-      <my-button variant="primary">Click me</my-button>
-    );
+    const { root, waitForChanges } = await render(<my-button variant="primary">Click me</my-button>);
 
     await waitForChanges();
     expect(root).toMatchSnapshot();
@@ -19,8 +14,10 @@ describe('my-button - snapshot tests (jsdom)', () => {
     const { root, waitForChanges } = await render(
       <my-card cardTitle="Test Card">
         <p>Card content</p>
-        <my-button slot="footer" variant="primary">Action</my-button>
-      </my-card>
+        <my-button slot="footer" variant="primary">
+          Action
+        </my-button>
+      </my-card>,
     );
 
     await waitForChanges();

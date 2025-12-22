@@ -46,25 +46,27 @@ describe('my-button - browser tests', () => {
   describe('visual regression', () => {
     it('should match screenshot for default variant', async () => {
       await render(<my-button>Default Button</my-button>);
-      
+
       expect(await page.screenshot()).toMatchSnapshot('button-default.png');
     });
 
     it('should match screenshot for primary variant', async () => {
       await render(<my-button variant="primary">Primary Button</my-button>);
-      
+
       expect(await page.screenshot()).toMatchSnapshot('button-primary.png');
     });
 
     it('should match screenshot for all variants', async () => {
       await render(
-        <div style={{ display: 'flex', gap: '1rem', padding: '1rem', flexDirection: 'column', alignItems: 'flex-start' }}>
+        <div
+          style={{ display: 'flex', gap: '1rem', padding: '1rem', flexDirection: 'column', alignItems: 'flex-start' }}
+        >
           <my-button>Default Button</my-button>
           <my-button variant="primary">Primary Button</my-button>
           <my-button variant="secondary">Secondary Button</my-button>
-        </div>
+        </div>,
       );
-      
+
       expect(await page.screenshot()).toMatchSnapshot('button-all-variants.png');
     });
   });
@@ -117,7 +119,7 @@ describe('my-button - browser tests', () => {
 
       expect(clickSpy).toHaveReceivedEvent();
       expect(clickSpy).toHaveReceivedEventTimes(1);
-      
+
       // Custom event should not have been received
       expect(() => {
         expect(customSpy).toHaveReceivedEvent();
@@ -132,7 +134,7 @@ describe('my-button - browser tests', () => {
       // userEvent.click() respects disabled state and won't click disabled buttons
       // This is the correct behavior! We can verify the button is disabled
       expect(shadowButton?.disabled).toBe(true);
-      
+
       // The spy should not have received any events
       expect(() => {
         expect(spy).toHaveReceivedEvent();

@@ -1,32 +1,35 @@
 #!/usr/bin/env node
 
 import { spawn, type ChildProcess } from 'child_process';
-import { watch as fsWatch, type FSWatcher } from 'fs';
-import { join, relative } from 'path';
-import { createJiti } from 'jiti';
-import micromatch from 'micromatch';
 
 /**
  * stencil-test - A wrapper that integrates Stencil build with Vitest testing.
- * 
+ *
  * Default behavior (no flags):
- *   - Builds Stencil in production mode
+ *   - Builds Stencil in dev mode (use --prod for production)
  *   - Runs Vitest tests once
- * 
+ *
  * Watch mode (--watch):
  *   - Runs Stencil build in watch mode
- *   - Automatically runs tests after each successful build
- *   - Watches test files and re-runs specific tests on change
- * 
+ *   - Runs Vitest in watch mode with interactive features:
+ *     - Press 'p' to filter by filename pattern
+ *     - Press 't' to filter by test name pattern
+ *     - Press 'f' to rerun only failed tests
+ *     - Press 'u' to update snapshots
+ *     - Press 'a' to rerun all tests
+ *     - Press 'q' to quit
+ *   - Automatically re-runs tests when files change
+ *
  * Usage:
  *   stencil-test [options] [testPathPattern]
- * 
+ *
  * Stencil options:
- *   --watch          Run in watch mode
+ *   --watch          Run in watch mode (enables interactive Vitest features)
+ *   --prod           Build in production mode (default: dev mode)
  *   --serve          Start dev server (with --watch)
  *   --port <number>  Dev server port (with --serve)
  *   --verbose        Show detailed Stencil output
- * 
+ *
  * Vitest options:
  *   --project <name> Run tests for specific project
  *   --reporter <name> Use specified reporter
@@ -34,7 +37,7 @@ import micromatch from 'micromatch';
  *   --ui             Enable Vitest UI
  *   --no-coverage    Disable coverage
  *   [testPathPattern] Run tests matching this pattern
- * 
+ *
  * Other options:
  *   --help, -h       Show this help message
  */
@@ -46,17 +49,18 @@ interface ParsedArgs {
   port?: string;
   verbose: boolean;
   debug: boolean;
-  
+  prod: boolean;
+
   // Vitest flags
   project?: string[];
   reporter?: string[];
   coverage: boolean;
   noCoverage: boolean;
   ui: boolean;
-  
+
   // Other
   help: boolean;
-  
+
   // Remaining args (test path patterns, unknown flags to pass through)
   vitestArgs: string[];
   stencilArgs: string[];
@@ -68,6 +72,7 @@ function parseArgs(argv: string[]): ParsedArgs {
     serve: false,
     verbose: false,
     debug: false,
+    prod: false,
     coverage: false,
     noCoverage: false,
     ui: false,
@@ -75,11 +80,11 @@ function parseArgs(argv: string[]): ParsedArgs {
     vitestArgs: [],
     stencilArgs: [],
   };
-  
+
   let i = 0;
   while (i < argv.length) {
     const arg = argv[i];
-    
+
     switch (arg) {
       // Help
       case '--help':
@@ -87,34 +92,39 @@ function parseArgs(argv: string[]): ParsedArgs {
         parsed.help = true;
         i++;
         break;
-      
+
       // Stencil flags
       case '--watch':
         parsed.watch = true;
         i++;
         break;
-      
+
       case '--serve':
         parsed.serve = true;
         i++;
         break;
-      
+
       case '--port':
         parsed.port = argv[i + 1];
         i += 2;
         break;
-      
+
       case '--verbose':
       case '-v':
         parsed.verbose = true;
         i++;
         break;
-      
+
       case '--debug':
         parsed.debug = true;
         i++;
         break;
-      
+
+      case '--prod':
+        parsed.prod = true;
+        i++;
+        break;
+
       // Vitest flags
       case '--project':
         if (!parsed.project) parsed.project = [];
@@ -122,32 +132,32 @@ function parseArgs(argv: string[]): ParsedArgs {
         parsed.vitestArgs.push(arg, argv[i + 1]);
         i += 2;
         break;
-      
+
       case '--reporter':
         if (!parsed.reporter) parsed.reporter = [];
         parsed.reporter.push(argv[i + 1]);
         parsed.vitestArgs.push(arg, argv[i + 1]);
         i += 2;
         break;
-      
+
       case '--coverage':
         parsed.coverage = true;
         parsed.vitestArgs.push(arg);
         i++;
         break;
-      
+
       case '--no-coverage':
         parsed.noCoverage = true;
         parsed.vitestArgs.push(arg);
         i++;
         break;
-      
+
       case '--ui':
         parsed.ui = true;
         parsed.vitestArgs.push(arg);
         i++;
         break;
-      
+
       // Unknown flags or test patterns - pass to vitest
       default:
         if (arg.startsWith('-')) {
@@ -168,7 +178,7 @@ function parseArgs(argv: string[]): ParsedArgs {
         break;
     }
   }
-  
+
   return parsed;
 }
 
@@ -181,11 +191,12 @@ stencil-test - Integrated Stencil build and Vitest testing
 Usage:
   stencil-test [options] [testPathPattern]
 
-Default (no flags): Build Stencil once and run tests once
-Watch mode: Build Stencil in watch mode and auto-run tests
+Default (no flags): Build Stencil in dev mode and run tests once
+Watch mode: Build Stencil in watch mode and run Vitest with interactive features
 
 Stencil Options:
-  --watch              Run Stencil in watch mode
+  --watch              Run Stencil in watch mode (enables Vitest interactive mode)
+  --prod               Build in production mode (default: dev mode)
   --serve              Start dev server (requires --watch)
   --port <number>      Dev server port (default: 3333)
   --verbose, -v        Show detailed logging
@@ -198,6 +209,14 @@ Vitest Options:
   --no-coverage        Disable coverage
   --ui                 Enable Vitest UI
   [testPathPattern]    Run only tests matching this pattern
+
+Interactive Watch Mode (when --watch is enabled):
+  Press 'p' to filter by filename pattern
+  Press 't' to filter by test name pattern  
+  Press 'f' to rerun only failed tests
+  Press 'u' to update snapshots
+  Press 'a' to rerun all tests
+  Press 'q' to quit
 
 Examples:
   stencil-test                           # Build once, test once
@@ -213,10 +232,7 @@ Examples:
 let stencilProcess: ChildProcess | null = null;
 let vitestProcess: ChildProcess | null = null;
 let debounceTimer: NodeJS.Timeout | null = null;
-let testFileWatcher: FSWatcher | null = null;
 let buildCount = 0;
-let lastChangedFile: string | null = null;
-let lastChangeTime = 0;
 let isRunningTests = false;
 
 const DEBOUNCE_MS = 500;
@@ -229,11 +245,12 @@ function log(message: string) {
 
 /**
  * Runs Vitest tests with the configured arguments
- * @param testFile - Optional path to a specific test file to run
+ * In watch mode, starts Vitest in its own watch mode for interactive features
+ * In non-watch mode, runs tests once
  */
-function runTests(testFile?: string) {
-  // Prevent overlapping test runs
-  if (isRunningTests) {
+function runTests() {
+  // Prevent overlapping test runs in non-watch mode
+  if (!args.watch && isRunningTests) {
     if (verbose) {
       log('Tests already running, skipping...');
     }
@@ -249,27 +266,15 @@ function runTests(testFile?: string) {
   isRunningTests = true;
 
   if (verbose) {
-    if (testFile) {
-      log(`Running tests for ${testFile} (build #${buildCount})...`);
-    } else {
-      log(`Running tests (build #${buildCount})...`);
-    }
+    log(`Running tests (build #${buildCount})...`);
   } else {
     log('Running tests...');
   }
 
-  // Always run tests in 'run' mode (even in watch mode)
-  // In watch mode, we re-run tests after each Stencil build
-  // Ensure --watch is not passed to vitest (we control when to re-run)
-  const filteredVitestArgs = args.vitestArgs.filter(arg => 
-    arg !== '--watch' && arg !== '-w'
-  );
-  const commandArgs = ['vitest', 'run', ...filteredVitestArgs].filter(Boolean);
-  
-  // Add specific test file if provided (overrides any path patterns in vitestArgs)
-  if (testFile) {
-    commandArgs.push(testFile);
-  }
+  // In watch mode, use Vitest's watch mode for interactive features
+  // In non-watch mode, use 'run' for a single test run
+  const vitestMode = args.watch ? 'watch' : 'run';
+  const commandArgs = ['vitest', vitestMode, ...args.vitestArgs].filter(Boolean);
 
   if (verbose) {
     log(`Command: npx ${commandArgs.join(' ')}`);
@@ -279,11 +284,15 @@ function runTests(testFile?: string) {
     cwd,
     stdio: 'inherit',
     shell: true,
+    env: {
+      ...process.env,
+      NODE_ENV: 'test',
+    },
   });
 
   vitestProcess.on('exit', (code) => {
     isRunningTests = false;
-    
+
     if (verbose) {
       if (code === 0) {
         log('Tests passed ✓');
@@ -292,7 +301,7 @@ function runTests(testFile?: string) {
       }
     }
     vitestProcess = null;
-    
+
     // In one-time mode, exit after tests complete
     if (!args.watch) {
       process.exit(code || 0);
@@ -311,10 +320,10 @@ function handleStencilOutput(data: Buffer) {
   process.stdout.write(output);
 
   // Detect build completion
-  // Stencil outputs build finish with a timestamp like "[12:34.5]  build finished"
-  if (output.includes('build finished')) {
+  // Stencil outputs "build finished" on first build or "rebuild finished" in watch mode
+  if (output.includes('build finished') || output.includes('rebuild finished')) {
     buildCount++;
-    
+
     if (verbose) {
       log(`Build #${buildCount} finished`);
     }
@@ -329,24 +338,20 @@ function handleStencilOutput(data: Buffer) {
       return;
     }
 
-    // Run tests after each Stencil build
-    // In watch mode, we run tests in 'run' mode (not watch) after each build
-    // This ensures tests are re-run when components change
-    if (debounceTimer) {
-      clearTimeout(debounceTimer);
-      if (verbose) {
-        log('Debouncing test run (clearing previous timer)');
+    // Run tests after the first successful build
+    // In watch mode, Vitest will automatically re-run when the dist/ files change
+    if (!vitestProcess) {
+      if (debounceTimer) {
+        clearTimeout(debounceTimer);
+        if (verbose) {
+          log('Debouncing initial test run');
+        }
       }
-    }
 
-    debounceTimer = setTimeout(() => {
-      runTests();
-    }, DEBOUNCE_MS);
-  }
-  
-  // Detect what files Stencil is watching/rebuilding for
-  if (verbose && output.includes('file updated')) {
-    process.stdout.write('[stencil-test] File update detected by Stencil\n');
+      debounceTimer = setTimeout(() => {
+        runTests();
+      }, DEBOUNCE_MS);
+    }
   }
 }
 
@@ -355,11 +360,6 @@ function cleanup() {
 
   if (debounceTimer) {
     clearTimeout(debounceTimer);
-  }
-
-  if (testFileWatcher) {
-    testFileWatcher.close();
-    testFileWatcher = null;
   }
 
   if (vitestProcess) {
@@ -383,10 +383,17 @@ process.on('exit', cleanup);
 // Build Stencil arguments
 const stencilArgs = ['stencil', 'build'];
 
+// Add --dev by default, unless --prod is explicitly passed
+if (args.prod) {
+  stencilArgs.push('--prod');
+} else {
+  stencilArgs.push('--dev');
+}
+
 if (args.watch) {
   stencilArgs.push('--watch');
   log('Starting Stencil in watch mode...');
-  
+
   if (args.serve) {
     stencilArgs.push('--serve');
     if (args.port) {
@@ -394,7 +401,6 @@ if (args.watch) {
     }
   }
 } else {
-  stencilArgs.push('--prod');
   log('Building Stencil...');
 }
 
@@ -425,7 +431,7 @@ stencilProcess.on('exit', (code) => {
   if (verbose) {
     log(`Stencil exited with code ${code}`);
   }
-  
+
   // In one-time build mode, stencil exits after build
   // Don't cleanup immediately - let tests finish first
   if (!args.watch) {
@@ -437,119 +443,8 @@ stencilProcess.on('exit', (code) => {
   }
 });
 
-// Load Vitest config to get test file patterns
-async function loadVitestConfig() {
-  const jiti = createJiti(import.meta.url, { interopDefault: true });
-  
-  // Try to load vitest config
-  const configPaths = [
-    join(cwd, 'vitest.config.ts'),
-    join(cwd, 'vitest.config.js'),
-    join(cwd, 'vitest.config.mts'),
-    join(cwd, 'vitest.config.mjs'),
-    join(cwd, 'vite.config.ts'),
-    join(cwd, 'vite.config.js'),
-  ];
-
-  for (const configPath of configPaths) {
-    try {
-      const config = await jiti.import(configPath, { default: true }) as any;
-      const vitestConfig = config?.default || config;
-      
-      // Collect all include patterns from all projects
-      const includePatterns = new Set<string>();
-      
-      // Check if config has projects
-      if (vitestConfig?.test?.projects && Array.isArray(vitestConfig.test.projects)) {
-        for (const project of vitestConfig.test.projects) {
-          const projectInclude = project?.test?.include;
-          if (projectInclude && Array.isArray(projectInclude)) {
-            projectInclude.forEach(pattern => includePatterns.add(pattern));
-          }
-        }
-      } else {
-        // Single test config (no projects)
-        const include = vitestConfig?.test?.include;
-        if (include && Array.isArray(include)) {
-          include.forEach(pattern => includePatterns.add(pattern));
-        }
-      }
-      
-      if (includePatterns.size > 0) {
-        const patterns = Array.from(includePatterns);
-        if (verbose) {
-          log(`Loaded test patterns from ${configPath}:`);
-          patterns.forEach(p => log(`  - ${p}`));
-        }
-        return patterns;
-      }
-    } catch (err) {
-      // Config file doesn't exist or can't be loaded, try next
-      continue;
-    }
-  }
-
-  // Fallback to Vitest defaults
-  const defaults = [
-    '**/*.{test,spec}.?(c|m)[jt]s?(x)',
-  ];
-  
-  if (verbose) {
-    log(`Using default Vitest patterns: ${defaults.join(', ')}`);
-  }
-  
-  return defaults;
+// Watch mode: Vitest handles test file watching automatically
+// Stencil handles component file watching automatically
+if (args.watch && verbose) {
+  log('Watch mode enabled - Vitest will watch test files and Stencil will watch component files');
 }
-
-// Watch test files for changes using patterns from Vitest config (only in watch mode)
-if (args.watch) {
-  loadVitestConfig().then((testPatterns) => {
-    try {
-      if (verbose) {
-        log(`Setting up test file watcher with cwd: ${cwd}`);
-        log(`Patterns: ${testPatterns.join(', ')}`);
-      }
-
-      // Watch src directory recursively with native fs.watch
-      const srcDir = join(cwd, 'src');
-      testFileWatcher = fsWatch(srcDir, { recursive: true }, (eventType, filename) => {
-        if (!filename) return;
-        
-        const relPath = relative(cwd, join(srcDir, filename));
-        
-        // Check if file matches any of the test patterns
-        if (micromatch.isMatch(relPath, testPatterns)) {
-          const now = Date.now();
-          
-          // Suppress duplicate logs for the same file within 100ms (atomic write threshold)
-          const shouldLog = lastChangedFile !== relPath || now - lastChangeTime > 100;
-          
-          if (shouldLog) {
-            log(`Test file changed: ${relPath}`);
-          }
-          
-          lastChangedFile = relPath;
-          lastChangeTime = now;
-          
-          // Debounce test execution
-          if (debounceTimer) {
-            clearTimeout(debounceTimer);
-          }
-
-          debounceTimer = setTimeout(() => {
-            runTests(relPath);
-          }, DEBOUNCE_MS);
-        }
-      });
-
-      if (verbose) {
-        log(`Watching test files in ${srcDir}`);
-      }
-    } catch (error) {
-      console.error('[stencil-test] Warning: Could not watch test files:', error);
-    }
-  }).catch((error) => {
-    console.error('[stencil-test] Warning: Could not load Vitest config:', error);
-  });
-}
-

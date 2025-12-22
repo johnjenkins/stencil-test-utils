@@ -1,57 +1,67 @@
 # @stencil/test-utils
 
-First-class testing utilities for Stencil design systems, powered by Vitest.
-
-## Features
-
-- 🚀 **Seamless Integration** - Works with your existing Stencil configuration
-- 🎯 **Multiple Environments** - Support for mock-doc (Node) and browser testing with Playwright
-- 📦 **Flexible Loaders** - Use any Stencil output target (lazy, custom-elements, dist, hydrate)
-- 🔧 **Easy Configuration** - Uses standard Vitest configuration with helpful Stencil defaults
-- 🧪 **Component Testing** - Focus on testing individual components with nested children
-- 📝 **Unified API** - Consistent testing experience across different environments
-- ✨ **Native Vitest Structure** - Works with Vitest's standard project configuration
+First-class testing utilities for Stencil components, powered by Vitest.
 
 ## Installation
 
 ```bash
-npm install --save-dev @stencil/test-utils @stencil/core vitest @vitest/browser playwright
+npm install --save-dev @stencil/test-utils vitest
+```
+
+For browser testing, also install:
+
+```bash
+npm install --save-dev @vitest/browser playwright
 ```
 
 ## Quick Start
 
-### 1. Create a `vitest.config.ts`
+### 1. Create `vitest.config.ts`
 
-Use standard Vitest configuration with Stencil enhancements:
+Use `defineVitestConfig` to create your Vitest configuration with Stencil enhancements:
 
 ```typescript
 import { defineVitestConfig } from '@stencil/test-utils/config';
 
 export default defineVitestConfig({
-  // Optional: Path to your Stencil config
   stencilConfig: './stencil.config.ts',
-  
   test: {
-    // Define multiple test environments using Vitest's native project structure
     projects: [
+      // Unit tests - node environment for functions / logic only
       {
         test: {
           name: 'unit',
-          include: ['**/*.spec.tsx'],
+          include: ['src/**/*.unit.{ts,tsx}'],
           environment: 'node',
-          setupFiles: ['@stencil/test-utils/mock-doc-setup'],
         },
       },
+
+      // Component tests - via a node DOM
+      {
+        test: {
+          name: 'spec',
+          include: ['src/**/*.spec.spec.{ts,tsx}'],
+          environment: 'stencil',
+          setupFiles: ['./vitest-setup.ts'],
+          // environmentOptions: {
+          //   stencil: {
+          //     domEnvironment: 'happy-dom' // 'jsdom' | 'mock-doc' (default), Make sure to install relevant packages
+          //   },
+          // },
+        },
+      },
+
+      // Browser tests - real browsers e.g. via Playwright
       {
         test: {
           name: 'browser',
-          include: ['**/*.e2e.tsx'],
+          include: ['src/**/*.test.{ts,tsx}'],
+          setupFiles: ['./vitest-setup.ts'],
           browser: {
             enabled: true,
             provider: 'playwright',
-            instances: [
-              { browser: 'chromium' }
-            ],
+            headless: true,
+            instances: [{ browser: 'chromium' }],
           },
         },
       },
@@ -60,295 +70,176 @@ export default defineVitestConfig({
 });
 ```
 
-### 2. Write Your First Test
+[refer Vitest documentation for all configuration options](https://vitest.dev/config/)
 
-**Unit test with mock-doc:**
+### 2. Create `vitest-setup.ts`
+
+Load your components:
 
 ```typescript
-// src/components/my-component/my-component.spec.tsx
+// Load Stencil components, adjusting according to your build output of choice *
+// * bear in mind, you may need `buildDist: true` or `--prod` to use an output other than the browser lazy-loader
+await import('./dist/test-components/test-components.esm.js');
+
+export {};
+```
+
+### 3. Write Tests
+
+```typescript
 import { describe, it, expect } from 'vitest';
 import { h } from '@stencil/core';
 import { render } from '@stencil/test-utils';
 
-describe('my-component', () => {
-  it('renders with props', async () => {
-    const { root } = await render(<my-component name="World" />);
-    expect(root.textContent).toContain('Hello, World!');
+describe('my-button', () => {
+  it('renders with text', async () => {
+    const { root } = await render(<my-button label="Click me" />);
+    expect(root).toHaveTextContent('Click me');
   });
 
-  it('updates on prop change', async () => {
-    const { root, setProps } = await render(<my-component name="World" />);
-    await setProps({ name: 'Stencil' });
-    expect(root.textContent).toContain('Hello, Stencil!');
+  it('responds to clicks', async () => {
+    const { root } = await render(<my-button label="Click" />);
+    root.click();
+    await root.waitForChanges();
+    expect(root).toHaveClass('clicked');
   });
 });
 ```
 
-**Browser test:**
+## API
 
-```typescript
-// src/components/my-component/my-component.e2e.tsx
-import { expect, test } from 'vitest';
-import { render } from '@stencil/test-utils';
-import { h } from '@stencil/core';
+### Rendering
 
-test('renders in real browser', async () => {
-  const { root } = await render(<my-component name="Browser" />);
-  expect(root.textContent).toContain('Hello, Browser!');
-});
-```
-
-### 3. Run Tests
-
-```bash
-# Run all tests (both unit and browser)
-npx vitest
-
-# Run only unit tests
-npx vitest --project unit
-
-# Run only browser tests
-npx vitest --project browser
-
-# Watch mode
-npx vitest --watch
-```
-
-## Configuration
-
-### Using Standard Vitest Projects
-
-The configuration uses Vitest's native project structure. The helper automatically adds:
-
-- JSX configuration (`jsxFactory: 'h'`, `jsxFragment: 'Fragment'`)
-- Default excludes (`node_modules`, `dist`, `build`, `.stencil`)
-- Global test APIs (`describe`, `it`, `expect`)
-
-### Test Environments
-
-Choose the right environment for your tests:
-
-- **`node` with mock-doc** - Stencil's built-in DOM implementation, fastest and most compatible
-- **`browser`** - Real browser testing with Playwright (chromium, firefox, webkit)
-- **`happy-dom`** - Lighter, faster alternative to jsdom
-- **`node`** - Minimal Node.js environment (no DOM)
-
-### Test Patterns
-
-Organize your tests with custom patterns:
-
-```typescript
-defineVitestConfig({
-  patterns: {
-    spec: ['**/*.spec.ts', '**/*.spec.tsx', '**/*.test.tsx'],
-    e2e: ['**/*.e2e.ts', '**/*.e2e.tsx']
-  }
-});
-```
-
-Typical file structure:
-
-```
-src/components/my-component/
-  ├── my-component.tsx       # Component implementation
-  ├── my-component.spec.tsx  # Unit/component tests (node/DOM)
-  └── my-component.e2e.tsx   # Browser tests (playwright/webdriverio)
-```
-
-### Loader Configuration
-
-Configure how Stencil components are loaded in tests:
-
-```typescript
-defineVitestConfig({
-  loader: {
-    // Lazy loader (default) - uses dist/esm output
-    type: 'lazy',
-    modulePath: './dist/esm/loader.js',
-    
-    // Or use custom elements bundle
-    type: 'custom-elements',
-    modulePath: './dist/components/index.js',
-    
-    // Or use dist output
-    type: 'dist',
-    
-    // Or use hydrate for SSR testing
-    type: 'hydrate'
-  }
-});
-```
-
-## API Reference
-
-### `render<T>(component, options)`
+#### `render(VNode)`
 
 Render a component for testing.
 
-```typescript
-const { root, waitForChanges, setProps, unmount, instance } = await render(
-  MyComponent,
-  {
-    // Component props
-    props: { name: 'World', count: 42 },
-    
-    // Slot content
-    slots: {
-      default: '<p>Default slot content</p>',
-      header: '<h1>Header slot</h1>'
-    },
-    
-    // Inner HTML
-    html: '<span>Inner content</span>',
-    
-    // HTML attributes
-    attributes: { class: 'custom-class', 'data-test': 'true' },
-    
-    // Wait for component to load (default: true)
-    waitForLoad: true
-  }
-);
+```tsx
+const { root, waitForChanges } = await render(<my-component name="World" />);
 
-// Access the rendered element
-expect(root.textContent).toBe('...');
-
-// Wait for component updates
-await waitForChanges();
+// Access the element
+expect(root.textContent).toContain('World');
 
 // Update props
-await setProps({ name: 'Stencil' });
-
-// Clean up
-unmount();
+root.name = 'Stencil';
+await waitForChanges();
 ```
 
-### `newPage()`
-
-Create a clean page for testing.
+### Available matchers:
 
 ```typescript
-const page = await newPage();
+// DOM assertions
+expect(element).toHaveClass('active');
+expect(element).toHaveClasses(['active', 'primary']);
+expect(element).toMatchClasses(['active']); // Partial match
+expect(element).toHaveAttribute('aria-label', 'Close');
+expect(element).toEqualAttribute('type', 'button');
+expect(element).toEqualAttributes({ type: 'button', disabled: true });
+expect(element).toHaveProperty('value', 'test');
+expect(element).toHaveTextContent('Hello World');
+expect(element).toEqualText('Exact text match');
+expect(element).toBeVisible();
 
-// Set HTML content
-await page.setContent('<my-component></my-component>');
-
-// Query elements
-const element = page.find('my-component');
-const elements = page.findAll('.item');
-
-// Wait for changes
-await page.waitForChanges();
+// Shadow DOM
+expect(element).toHaveShadowRoot();
+expect(element).toEqualHtml('<div>Expected HTML</div>');
+expect(element).toEqualLightHtml('<div>Light DOM only</div>');
 ```
 
-### `setupLoader(config)`
+### Event Testing
 
-Manually setup the component loader.
+Test custom events emitted by your components:
 
 ```typescript
-import { setupLoader } from '@stencil/test-utils';
+const { root } = await render(<my-button />);
 
-// In a setup file or before tests
-await setupLoader({
-  type: 'lazy',
-  modulePath: './dist/esm/loader.js'
-});
+// Spy on events
+const clickSpy = root.spyOnEvent('buttonClick');
+const changeSpy = root.spyOnEvent('valueChange');
+
+// Trigger events
+root.click();
+await root.waitForChanges();
+
+// Assert events were emitted
+expect(clickSpy).toHaveReceivedEvent();
+expect(clickSpy).toHaveReceivedEventTimes(1);
+expect(clickSpy).toHaveReceivedEventDetail({ buttonId: 'my-button' });
+
+// Access event data
+expect(clickSpy.events).toHaveLength(1);
+expect(clickSpy.firstEvent?.detail).toEqual({ buttonId: 'my-button' });
+expect(clickSpy.lastEvent?.detail).toEqual({ buttonId: 'my-button' });
 ```
 
-## Advanced Usage
+## Snapshots
 
-### Custom Vitest Configuration
-
-Merge additional Vitest configuration:
+The package includes a custom snapshot serializer for Stencil components that properly handles shadow DOM:
 
 ```typescript
-import { defineVitestConfig } from '@stencil/test-utils';
+const { root } = await render(<my-component />);
+expect(root).toMatchSnapshot();
+```
 
-export default defineVitestConfig(
-  {
-    stencilConfig: './stencil.config.ts',
-    environment: 'mock-doc'
-  },
-  {
-    // Additional Vitest config
-    test: {
-      coverage: {
-        provider: 'istanbul',
-        reporter: ['text', 'lcov']
-      },
-      testTimeout: 10000
-    }
+**Snapshot output example:**
+
+```html
+<my-component>
+  <mock:shadow-root>
+    <button class="primary">
+      <slot />
+    </button>
+  </mock:shadow-root>
+  Click me
+</my-component>
+```
+
+## CLI
+
+The `stencil-test` CLI wraps both Stencil builds with Vitest testing.
+
+### Add to package.json
+
+```json
+{
+  "scripts": {
+    "test": "stencil-test",
+    "test:watch": "stencil-test --watch"
   }
-);
-```
-
-### Browser Testing (Coming Soon)
-
-Support for browser-based testing with Playwright and WebdriverIO:
-
-```typescript
-defineVitestConfig({
-  browserEnvironment: 'playwright',
-  patterns: {
-    e2e: '**/*.e2e.tsx'
-  }
-});
-```
-
-### CLI Helpers (Coming Soon)
-
-```bash
-# Run only spec tests
-npx stencil-test --spec
-
-# Run only e2e tests
-npx stencil-test --e2e
-
-# Watch mode
-npx stencil-test --watch
-```
-
-## Best Practices
-
-1. **Build Before Testing** - Make sure to build your Stencil project before running tests
-2. **Use mock-doc** - For fastest tests, use Stencil's mock-doc environment
-3. **Separate Concerns** - Use `.spec.tsx` for component tests, `.e2e.tsx` for browser tests
-4. **Clean Up** - Always call `unmount()` or let the test framework clean up
-5. **Wait for Changes** - Use `waitForChanges()` after prop updates or DOM manipulations
-
-## Troubleshooting
-
-### Components Not Loading
-
-Make sure your project is built:
-
-```bash
-npm run build
-```
-
-### Import Errors
-
-Check that your loader path is correct:
-
-```typescript
-loader: {
-  type: 'lazy',
-  modulePath: './dist/esm/loader.js'  // Verify this path exists
 }
 ```
 
-### Mock-doc Issues
-
-If mock-doc isn't working, try using jsdom:
+### Usage
 
 ```bash
-npm install --save-dev jsdom
+# Build once, test once
+stencil-test
+
+# Watch mode (rebuilds on component changes, interactive Vitest)
+stencil-test --watch
+
+# Watch mode with dev server
+stencil-test --watch --serve
+
+# Production build before testing
+stencil-test --prod
+
+# Pass arguments to Vitest
+stencil-test --watch --coverage
+
+# Test specific files
+stencil-test button.spec.ts
+
+# Test specific project
+stencil-test --project browser
 ```
 
-```typescript
-defineVitestConfig({
-  environment: 'jsdom'
-});
-```
+### CLI Options
+
+The `stencil-test` CLI supports most of Stencil's CLI options and all of Vitest CLI options
+
+- For full Stencil CLI options, see [Stencil CLI docs](https://stenciljs.com/docs/cli).
+- For full Vitest CLI options, see [Vitest CLI docs](https://vitest.dev/guide/cli.html).
 
 ## License
 
@@ -356,4 +247,4 @@ MIT
 
 ## Contributing
 
-Contributions welcome! Please read the contributing guidelines before submitting a PR.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup and guidelines.

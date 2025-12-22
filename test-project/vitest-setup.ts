@@ -4,7 +4,6 @@
  */
 
 // Load the Stencil components for this project
-const { defineCustomElements } = await import('./dist/esm/loader.js');
-await defineCustomElements();
+await import('./dist/test-components/test-components.esm.js');
 
 export {};

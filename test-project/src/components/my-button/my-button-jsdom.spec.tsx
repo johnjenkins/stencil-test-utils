@@ -6,51 +6,47 @@ describe('my-button - jsdom tests', () => {
   describe('rendering in jsdom', () => {
     it('should render with default props', async () => {
       const result = await render(<my-button>Click me</my-button>);
-      
+
       expect(result.root).toBeTruthy();
       expect(result.root.tagName.toLowerCase()).toBe('my-button');
     });
 
     it('should render with variant', async () => {
-      const result = await render(
-        <my-button variant="primary">
-          Primary Button
-        </my-button>
-      );
-      
+      const result = await render(<my-button variant="primary">Primary Button</my-button>);
+
       await result.waitForChanges();
       const shadowRoot = result.root.shadowRoot;
       const button = shadowRoot!.querySelector('button');
-      
+
       expect(button?.classList.contains('button--primary')).toBe(true);
     });
 
     it('should handle clicks', async () => {
       let clicked = false;
       const result = await render(<my-button>Click me</my-button>);
-      
+
       result.root.addEventListener('buttonClick', () => {
         clicked = true;
       });
-      
+
       await result.waitForChanges();
       const shadowRoot = result.root.shadowRoot;
       const button = shadowRoot!.querySelector('button');
-      
+
       button?.click();
-      
+
       expect(clicked).toBe(true);
     });
 
     it('should update props dynamically', async () => {
       const result = await render(<my-button variant="primary">Button</my-button>);
-      
+
       await result.setProps({ variant: 'secondary' });
       await result.waitForChanges();
-      
+
       const shadowRoot = result.root.shadowRoot;
       const button = shadowRoot!.querySelector('button');
-      
+
       expect(button?.classList.contains('button--secondary')).toBe(true);
       expect(button?.classList.contains('button--primary')).toBe(false);
     });
@@ -64,7 +60,7 @@ describe('my-button - jsdom tests', () => {
 
     it('should work with document.querySelector', async () => {
       await render(<my-button id="test-button">Test</my-button>);
-      
+
       // In jsdom, we can use standard DOM APIs
       const element = document.querySelector('#test-button');
       expect(element).toBeTruthy();
@@ -80,15 +76,15 @@ describe('my-button - jsdom tests', () => {
 
     it('should support DOM manipulation alongside components', async () => {
       await render(<my-button>Stencil Button</my-button>);
-      
+
       const div = document.createElement('div');
       div.id = 'test-div';
       div.textContent = 'Regular div';
       document.body.appendChild(div);
-      
+
       const button = document.querySelector('my-button');
       const regularDiv = document.querySelector('#test-div');
-      
+
       expect(button).toBeTruthy();
       expect(regularDiv?.textContent).toBe('Regular div');
     });
@@ -104,12 +100,16 @@ describe('my-button - jsdom tests', () => {
     });
 
     it('should render components just like mock-doc', async () => {
-      const result = await render(<my-button variant="danger" size="large">Test</my-button>);
-      
+      const result = await render(
+        <my-button variant="danger" size="large">
+          Test
+        </my-button>,
+      );
+
       await result.waitForChanges();
       const shadowRoot = result.root.shadowRoot;
       const button = shadowRoot!.querySelector('button');
-      
+
       expect(button?.classList.contains('button--danger')).toBe(true);
       expect(button?.classList.contains('button--large')).toBe(true);
     });
