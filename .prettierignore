@@ -8,3 +8,4 @@ coverage/
 loader/
 www/
 hydrate/
+test-project/src/components.d.ts
