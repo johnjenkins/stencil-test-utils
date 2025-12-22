@@ -1,5 +1,5 @@
 import { defineVitestConfig } from '@stencil/test-utils/config';
-import { playwright } from '@vitest/browser-playwright'
+import { playwright } from '@vitest/browser-playwright';
 
 export default defineVitestConfig({
   stencilConfig: './stencil.config.ts',

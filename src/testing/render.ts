@@ -13,11 +13,11 @@ const eventSpies = new WeakMap<HTMLElement, EventSpy[]>();
  * Render using Stencil's render
  */
 export async function render<T extends HTMLElement = HTMLElement>(
-  vnode: any, 
+  vnode: any,
   options: RenderOptions = {
     clearStage: true,
     stageAttrs: { class: 'stencil-component-stage' },
-  }
+  },
 ): Promise<RenderResult<T>> {
   // Use Stencil's render which handles VNodes properly in the browser
   const container = document.createElement('div');
@@ -27,7 +27,7 @@ export async function render<T extends HTMLElement = HTMLElement>(
   if (options.clearStage) {
     // Clear existing stage containers
     const existingStages = document.querySelectorAll('div');
-    existingStages.forEach(stage => stage.remove());
+    existingStages.forEach((stage) => stage.remove());
   }
   document.body.appendChild(container);
 
@@ -99,7 +99,7 @@ export async function render<T extends HTMLElement = HTMLElement>(
   const spyOnEvent = (eventName: string): EventSpy => {
     // Return existing spy if already created
     if (eventSpies.has(container)) {
-      return eventSpies.get(container)!.find(spy => spy.eventName === eventName)!;
+      return eventSpies.get(container)!.find((spy) => spy.eventName === eventName)!;
     }
 
     const spy: EventSpy = {

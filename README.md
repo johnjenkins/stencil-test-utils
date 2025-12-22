@@ -5,13 +5,19 @@ First-class testing utilities for Stencil components, powered by Vitest.
 ## Installation
 
 ```bash
-npm install --save-dev @stencil/test-utils vitest
+npm i --save-dev @stencil/test-utils vitest
 ```
 
 For browser testing, also install:
 
 ```bash
-npm install --save-dev @vitest/browser playwright
+npm i -D @vitest/browser-preview
+```
+
+or
+
+```bash
+npm i -D @vitest/browser-webdriverio
 ```
 
 ## Quick Start
@@ -22,12 +28,14 @@ Use `defineVitestConfig` to create your Vitest configuration with Stencil enhanc
 
 ```typescript
 import { defineVitestConfig } from '@stencil/test-utils/config';
+import { playwright } from '@vitest/browser-playwright';
+// or import { wdio } from '@vitest/browser-webdriverio';
 
 export default defineVitestConfig({
   stencilConfig: './stencil.config.ts',
   test: {
     projects: [
-      // Unit tests - node environment for functions / logic only
+      // Unit tests - node environment for functions / logic
       {
         test: {
           name: 'unit',
@@ -36,11 +44,11 @@ export default defineVitestConfig({
         },
       },
 
-      // Component tests - via a node DOM
+      // Component tests - via a node DOM of your choice
       {
         test: {
           name: 'spec',
-          include: ['src/**/*.spec.spec.{ts,tsx}'],
+          include: ['src/**/*.spec.{ts,tsx}'],
           environment: 'stencil',
           setupFiles: ['./vitest-setup.ts'],
           // environmentOptions: {
@@ -59,7 +67,7 @@ export default defineVitestConfig({
           setupFiles: ['./vitest-setup.ts'],
           browser: {
             enabled: true,
-            provider: 'playwright',
+            provider: playwright(),
             headless: true,
             instances: [{ browser: 'chromium' }],
           },
@@ -72,13 +80,14 @@ export default defineVitestConfig({
 
 [refer Vitest documentation for all configuration options](https://vitest.dev/config/)
 
-### 2. Create `vitest-setup.ts`
+### 2. Load your components via `vitest-setup.ts`
 
 Load your components:
 
 ```typescript
-// Load Stencil components, adjusting according to your build output of choice *
-// * bear in mind, you may need `buildDist: true` or `--prod` to use an output other than the browser lazy-loader
+// Load Stencil components, adjusting according to your build output of choice*
+// (*Bear in mind, you may need `buildDist: true` (in your stencil.config)
+// or `--prod` to use an output other than the browser lazy-loader)
 await import('./dist/test-components/test-components.esm.js');
 
 export {};
@@ -103,6 +112,20 @@ describe('my-button', () => {
     expect(root).toHaveClass('clicked');
   });
 });
+```
+
+### 4. Run tests
+
+```json
+// package.json
+{
+  "scripts": {
+    "test": "stencil-test",
+    "test:watch": "stencil-test --watch",
+    "test:e2e": "stencil-test --project browser",
+    "test:spec": "stencil-test --project spec"
+  }
+}
 ```
 
 ## API

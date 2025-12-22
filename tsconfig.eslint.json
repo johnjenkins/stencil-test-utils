@@ -7,6 +7,7 @@
     "src/**/*",
     "bin/**/*",
     "tests/**/*",
+    "scripts/**/*",
     "test-project/src/**/*",
     "test-project/stencil.config.ts",
     "test-project/vitest.config.ts",

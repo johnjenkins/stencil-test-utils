@@ -48,6 +48,18 @@
     "web components",
     "component testing"
   ],
+  "scripts": {
+    "build": "tsc && tsc -p tsconfig.bin.json",
+    "dev": "tsc --watch",
+    "test:examples": "pnpm --filter test-project test",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "knip": "knip",
+    "quality": "pnpm format && pnpm lint && pnpm knip",
+    "quality:fix": "pnpm format:fix && pnpm lint:fix && pnpm knip"
+  },
   "engines": {
     "node": "^20.0.0 || ^22.0.0 || >=24.0.0"
   },
@@ -76,6 +88,11 @@
       "optional": true
     }
   },
+  "dependencies": {
+    "jiti": "^2.6.1",
+    "local-pkg": "^1.1.2",
+    "vitest-environment-stencil": "workspace:*"
+  },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "@stencil/core": "^4.0.0",
@@ -83,27 +100,10 @@
     "@typescript-eslint/eslint-plugin": "^8.50.0",
     "@typescript-eslint/parser": "^8.50.0",
     "@vitest/coverage-v8": "^3.0.0",
-    "changelogen": "^0.6.2",
     "eslint": "^9.39.2",
     "knip": "^5.76.3",
     "prettier": "^3.7.4",
-    "semver": "^7.7.3",
     "typescript": "~5.8.3",
     "vitest": "^4.0.0"
-  },
-  "dependencies": {
-    "jiti": "^2.6.1",
-    "local-pkg": "^1.1.2"
-  },
-  "scripts": {
-    "build": "tsc && tsc -p tsconfig.bin.json",
-    "dev": "tsc --watch",
-    "test:examples": "pnpm --filter test-project test",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "knip": "knip",
-    "quality": "pnpm format && pnpm lint:fix && pnpm knip"
   }
 }

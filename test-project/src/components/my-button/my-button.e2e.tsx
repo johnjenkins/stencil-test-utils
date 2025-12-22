@@ -49,7 +49,7 @@ describe('my-button - browser tests', () => {
     });
 
     it('should match screenshot for primary variant', async () => {
-       const { root } = await render(<my-button variant="primary">Primary Button</my-button>);
+      const { root } = await render(<my-button variant="primary">Primary Button</my-button>);
       await expect(root).toMatchScreenshot('primary' as any);
     });
 
