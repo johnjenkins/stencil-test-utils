@@ -218,12 +218,7 @@ function applyStencilDefaults(config: ViteUserConfig, stencilConfig?: StencilCon
     const coverageExcludes =
       testIncludes.length > 0
         ? generateCoverageExcludes(testIncludes, srcDir)
-        : [
-            `${srcDir}/**/*.spec.{ts,tsx}`,
-            `${srcDir}/**/*.e2e.{ts,tsx}`,
-            `${srcDir}/**/*.test.{ts,tsx}`,
-            `${srcDir}/**/*.jsdom.spec.{ts,tsx}`,
-          ];
+        : [`${srcDir}/**/*.spec.{ts,tsx}`, `${srcDir}/**/*.e2e.{ts,tsx}`, `${srcDir}/**/*.test.{ts,tsx}`];
 
     result.test.coverage = {
       provider: 'v8',
@@ -239,6 +234,13 @@ function applyStencilDefaults(config: ViteUserConfig, stencilConfig?: StencilCon
   } else {
     // Single project mode - enhance the test config directly
     result.test = enhanceTestConfig(result.test, stencilConfig);
+  }
+
+  if (result.test.onConsoleLog === undefined) {
+    result.test.onConsoleLog = (log) => {
+      if (log?.includes('Running in development mode.')) return false;
+      return true;
+    };
   }
 
   return result;
