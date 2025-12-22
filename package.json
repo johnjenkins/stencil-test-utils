@@ -51,7 +51,7 @@
   "scripts": {
     "build": "tsc && tsc -p tsconfig.bin.json",
     "dev": "tsc --watch",
-    "test:examples": "pnpm --filter test-project test",
+    "test": "pnpm --filter test-project test",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --check .",

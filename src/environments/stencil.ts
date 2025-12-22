@@ -38,7 +38,7 @@ const environmentMap: Record<string, EnvironmentStencil> = {
  */
 export default <Environment>{
   name: 'stencil',
-  transformMode: 'ssr',
+  viteEnvironment: 'ssr',
 
   async setup(global, options) {
     const { stencil = {} } = options as { stencil?: StencilEnvironmentOptions };
