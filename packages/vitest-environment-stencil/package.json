@@ -22,6 +22,6 @@
     "testing"
   ],
   "peerDependencies": {
-    "@stencil/test-utils": "workspace:*"
+    "@johnjenkins/stencil-vitest": "workspace:*"
   }
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, h } from '@stencil/test-utils';
+import { render, h } from '@johnjenkins/stencil-vitest';
 
 // Test file watching
 describe('my-button - custom matchers (happy-dom)', () => {

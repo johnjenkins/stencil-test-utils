@@ -1,4 +1,4 @@
-# Contributing to @stencil/test-utils
+# Contributing to @johnjenkins/stencil-vitest
 
 Thank you for your interest in contributing! This guide will help you get set up for development.
 

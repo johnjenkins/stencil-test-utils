@@ -3,7 +3,7 @@
  * These tests run in a real browser using Playwright
  */
 import { describe, it, expect } from 'vitest';
-import { render, h } from '@stencil/test-utils';
+import { render, h } from '@johnjenkins/stencil-vitest';
 import { userEvent } from 'vitest/browser';
 
 describe('my-button - browser tests', () => {

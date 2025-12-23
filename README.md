@@ -1,11 +1,11 @@
-# @stencil/test-utils
+# @johnjenkins/stencil-vitest
 
 First-class testing utilities for Stencil components, powered by Vitest.
 
 ## Installation
 
 ```bash
-npm i --save-dev @stencil/test-utils vitest
+npm i --save-dev @johnjenkins/stencil-vitest vitest
 ```
 
 For browser testing, also install:
@@ -27,7 +27,7 @@ npm i -D @vitest/browser-webdriverio
 Use `defineVitestConfig` to create your Vitest configuration with Stencil enhancements:
 
 ```typescript
-import { defineVitestConfig } from '@stencil/test-utils/config';
+import { defineVitestConfig } from '@johnjenkins/stencil-vitest/config';
 import { playwright } from '@vitest/browser-playwright';
 // or import { wdio } from '@vitest/browser-webdriverio';
 
@@ -97,7 +97,7 @@ export {};
 
 ```typescript
 import { describe, it, expect } from 'vitest';
-import { render, h } from '@stencil/test-utils';
+import { render, h } from '@johnjenkins/stencil-vitest';
 
 describe('my-button', () => {
   it('renders with text', async () => {
@@ -137,7 +137,7 @@ describe('my-button', () => {
 Render a component for testing.
 
 ```tsx
-import { render, h } from '@stencil/test-utils';
+import { render, h } from '@johnjenkins/stencil-vitest';
 const { root, waitForChanges } = await render(<my-component name="World" />);
 
 // Access the element
@@ -200,7 +200,7 @@ expect(clickSpy.lastEvent?.detail).toEqual({ buttonId: 'my-button' });
 The package includes a custom snapshot serializer for Stencil components that properly handles shadow DOM:
 
 ```typescript
-import { render, h } from '@stencil/test-utils';
+import { render, h } from '@johnjenkins/stencil-vitest';
 ...
 const { root } = await render(<my-component />);
 expect(root).toMatchSnapshot();
@@ -224,7 +224,7 @@ expect(root).toMatchSnapshot();
 Browser tests can include screenshot comparisons using Vitest's screenshot capabilities:
 
 ```tsx
-import { render, h } from '@stencil/test-utils';
+import { render, h } from '@johnjenkins/stencil-vitest';
 ...
 const { root } = await render(<my-button variant="primary">Primary Button</my-button>);
 await expect(root).toMatchScreenshot();

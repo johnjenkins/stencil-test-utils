@@ -22,7 +22,7 @@ import type { Config as StencilConfig } from '@stencil/core/internal';
  *
  * @example
  * ```ts
- * import { defineVitestConfig } from '@stencil/test-utils/config';
+ * import { defineVitestConfig } from '@johnjenkins/stencil-vitest/config';
  *
  * export default defineVitestConfig({
  *   test: {
@@ -322,15 +322,15 @@ function enhanceProject(project: any, stencilConfig?: StencilConfig): any {
 
     // Auto-inject jsdom-setup for jsdom environment
     if (environment === 'jsdom') {
-      if (!setupFilesArray.includes('@stencil/test-utils/jsdom-setup')) {
-        enhanced.test.setupFiles = ['@stencil/test-utils/jsdom-setup', ...setupFilesArray];
+      if (!setupFilesArray.includes('@johnjenkins/stencil-vitest/jsdom-setup')) {
+        enhanced.test.setupFiles = ['@johnjenkins/stencil-vitest/jsdom-setup', ...setupFilesArray];
       }
     }
 
     // Auto-inject happy-dom-setup for happy-dom environment
     if (environment === 'happy-dom') {
-      if (!setupFilesArray.includes('@stencil/test-utils/happy-dom-setup')) {
-        enhanced.test.setupFiles = ['@stencil/test-utils/happy-dom-setup', ...setupFilesArray];
+      if (!setupFilesArray.includes('@johnjenkins/stencil-vitest/happy-dom-setup')) {
+        enhanced.test.setupFiles = ['@johnjenkins/stencil-vitest/happy-dom-setup', ...setupFilesArray];
       }
     }
 

@@ -1,2 +1,2 @@
-export { default } from '@stencil/test-utils/vitest';
-export type { StencilEnvironmentOptions } from '@stencil/test-utils/vitest';
+export { default } from '@johnjenkins/stencil-vitest/vitest';
+export type { StencilEnvironmentOptions } from '@johnjenkins/stencil-vitest/vitest';

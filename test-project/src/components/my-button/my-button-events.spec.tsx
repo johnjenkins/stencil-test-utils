@@ -2,7 +2,7 @@
  * Tests demonstrating event spy functionality
  */
 import { describe, it, expect } from 'vitest';
-import { render } from '@stencil/test-utils';
+import { render } from '@johnjenkins/stencil-vitest';
 import { h } from '@stencil/core';
 
 describe('my-button - event spy', () => {

@@ -1,4 +1,4 @@
-import { defineVitestConfig } from '@stencil/test-utils/config';
+import { defineVitestConfig } from '@johnjenkins/stencil-vitest/config';
 import { playwright } from '@vitest/browser-playwright';
 
 export default defineVitestConfig({

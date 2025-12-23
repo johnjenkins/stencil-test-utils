@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, h } from '@stencil/test-utils';
+import { render, h } from '@johnjenkins/stencil-vitest';
 
 describe('my-button - jsdom tests', () => {
   describe('rendering in jsdom', () => {

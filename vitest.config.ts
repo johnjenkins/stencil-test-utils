@@ -14,7 +14,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@stencil/test-utils': './src/index.ts',
+      '@johnjenkins/stencil-vitest': './src/index.ts',
     },
   },
 });

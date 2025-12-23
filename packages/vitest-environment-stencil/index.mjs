@@ -1,1 +1,1 @@
-export { default } from '@stencil/test-utils/vitest';
+export { default } from '@johnjenkins/stencil-vitest/vitest';

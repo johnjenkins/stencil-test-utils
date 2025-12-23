@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "description": "Test fixture for @stencil/test-utils",
+  "description": "Test fixture for @johnjenkins/stencil-vitest",
   "scripts": {
     "build": "stencil build --prod",
     "start": "stencil build --watch --serve",
@@ -13,7 +13,7 @@
     "@stencil/core": "^4.0.0"
   },
   "devDependencies": {
-    "@stencil/test-utils": "workspace:*",
+    "@johnjenkins/stencil-vitest": "workspace:*",
     "@vitest/browser": "^4.0.0",
     "@vitest/browser-playwright": "^4.0.16",
     "happy-dom": "^20.0.11",

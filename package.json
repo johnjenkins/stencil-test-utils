@@ -1,5 +1,5 @@
 {
-  "name": "@stencil/test-utils",
+  "name": "@johnjenkins/stencil-vitest",
   "version": "0.1.0",
   "description": "First-class testing utilities for Stencil design systems with Vitest",
   "license": "MIT",
