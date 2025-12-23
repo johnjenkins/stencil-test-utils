@@ -44,7 +44,7 @@ export default defineVitestConfig({
         },
       },
 
-      // Component tests - via a node DOM of your choice
+      // Spec tests - via a node DOM of your choice
       {
         test: {
           name: 'spec',
@@ -53,7 +53,8 @@ export default defineVitestConfig({
           setupFiles: ['./vitest-setup.ts'],
           // environmentOptions: {
           //   stencil: {
-          //     domEnvironment: 'happy-dom' // 'jsdom' | 'mock-doc' (default), Make sure to install relevant packages
+          //     domEnvironment: 'happy-dom' | 'jsdom' | 'mock-doc' (default)
+          //                      ^^ Make sure to install relevant packages
           //   },
           // },
         },

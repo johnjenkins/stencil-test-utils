@@ -21,7 +21,7 @@
     "stencil",
     "testing"
   ],
-  "peerDependencies": {
-    "@johnjenkins/stencil-vitest": "workspace:*"
+  "dependencies": {
+    "@johnjenkins/stencil-vitest": "latest"
   }
 }

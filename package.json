@@ -1,6 +1,6 @@
 {
   "name": "@johnjenkins/stencil-vitest",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "First-class testing utilities for Stencil design systems with Vitest",
   "license": "MIT",
   "type": "module",
@@ -86,12 +86,15 @@
     },
     "@vitest/browser-playwright": {
       "optional": true
-    }
+    },
+    "@vitest/browser-preview": {
+      "optional": true
+    } 
   },
   "dependencies": {
     "jiti": "^2.6.1",
     "local-pkg": "^1.1.2",
-    "vitest-environment-stencil": "workspace:*"
+    "vitest-environment-stencil": "latest"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
@@ -99,7 +102,7 @@
     "@types/node": "^20.19.27",
     "@typescript-eslint/eslint-plugin": "^8.50.0",
     "@typescript-eslint/parser": "^8.50.0",
-    "@vitest/coverage-v8": "^3.0.0",
+    "@vitest/coverage-v8": "^4.0.0",
     "eslint": "^9.39.2",
     "knip": "^5.76.3",
     "prettier": "^3.7.4",
